@@ -1,8 +1,17 @@
 # Portable report artifacts
 
-`evaluation_curves.json`, `status_results.csv` and `analysis.json` contain the
-compact numeric evidence for the figures and report. The complete local
-trajectories and model checkpoints are intentionally not committed.
+The current LaTeX report covers twelve completed seed-42 conditions, including
+two zero-penalty learned-gate pilots on Pressure Plate. `report_table_data.csv`
+contains the current tables' values, checked against all twelve runs' raw
+evaluation logs. Query counts use each environment's common final round;
+positive peak rounds identify the earliest highest-success checkpoint.
+
+`evaluation_curves.json`, `status_results.csv`, `analysis.json`, `STATUS_REPORT.md`
+and the earlier figures preserve the original ten fixed/event baseline runs.
+Their peak-query columns retain the historical definition and must not be
+mistaken for the new report's final-query column. The two additional gates'
+curves, trace checks and analysis are in `../gate_lambda0_2026-11-16/`.
+The complete local trajectories and model checkpoints are not committed.
 
 To redraw the figures, install matplotlib and numpy in a separate analysis
 environment and run `python plot_results.py` from this directory. To regenerate
@@ -13,5 +22,5 @@ updated analysis products in this report directory.
 
 See `docs/query-experiment-metrics.md` and the frozen configs in each local batch
 for full training and metric conventions. See `README.txt` for the self-contained
-LaTeX status-update source. The report describes the completed fixed/event
-pilots; newer learned-gate runs are documented separately.
+LaTeX status-update source, including the separate AI disclosure input file.
+The source ZIP includes every required TeX and style file.

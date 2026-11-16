@@ -1,0 +1,13 @@
+environment,schedule,seed,total_training_rounds,peak_success_percent,final_success_percent,peak_round,final_queries_per_episode
+pressure_plate,event,42,200,99.30,18.98,130,3.09
+pressure_plate,fixed_38,42,200,0.00,0.00,--,6.00
+pressure_plate,fixed_76,42,200,100.00,0.00,120,3.00
+pressure_plate,fixed_152,42,200,0.00,0.00,--,2.00
+pressure_plate,single,42,200,0.00,0.00,--,1.00
+pressure_plate,learned_gate_lambda0,42,200,0.00,0.00,--,117.39
+pressure_plate,coverage_gate_lambda0,42,200,0.00,0.00,--,106.71
+navigation,event,42,400,85.16,76.56,150,1.75
+navigation,fixed_25,42,400,85.94,74.84,175,5.07
+navigation,fixed_50,42,400,82.11,63.28,50,2.83
+navigation,fixed_100,42,400,86.72,75.08,200,1.51
+navigation,single,42,400,79.77,74.14,250,1.00

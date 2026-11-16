@@ -51,21 +51,23 @@
 
 \section{Pilot Experiments}
 
-Our proposal asks whether agents can learn when to replace their behaviors without handcrafted event rules. We began with a pilot using the public implementation of \citet{buchi2026events}. A query regenerates LoRA adapters over a shared policy; agents continue to choose actions from current observations between queries.
+We study whether a team can learn when to regenerate persistent behaviors without handcrafted event rules. Using the public implementation of \citet{buchi2026events}, queries replace agent-specific LoRA adapters over a shared policy; primitive actions still respond to current observations between queries.
 
-We compared handcrafted events, three fixed $K$-step schedules, and a single query at initialization in three-agent Pressure Plate and four-agent Navigation. Each schedule was trained from scratch, giving ten runs with one training seed per setting. Training budgets were fixed within each environment. The experiments examine how much query scheduling matters before we introduce a learned query policy. Full results and reproducibility details appear in Appendix~\ref{app:results}.
+We first trained five schedules from scratch in three-agent Pressure Plate and four-agent Navigation: handcrafted events, three fixed $K$ intervals, and initialization only. We then added two Pressure Plate pilots: a centralized Bernoulli gate trained jointly with the actor and generator, and a coverage variant mixing in random query-or-keep decisions during training (20\% mixture weight). Both use zero query penalty ($\lambda=0$), the original task rewards, and no event labels. Coverage exploration is disabled during evaluation. All Pressure Plate conditions train for 200 rounds; Navigation conditions train for 400. Each of the twelve runs uses training seed 42. Full results appear in Appendix~\ref{app:results}.
 
 \section{Main Findings}
 
-\textbf{Pressure Plate is highly sensitive to the query schedule.} Handcrafted events reached 99.3\% peak team success and fixed $K=76$ reached 100\%, while $K=38$, $K=152$, and initialization-only queries never completed the task in this seed. Thus, both frequent and infrequent updates can fail. Pressure Plate requires agents to take turns holding plates so teammates can pass through a door, making the timing of behavior changes relevant to coordination. The sharp differences across schedules make it our more informative environment for studying when to query. However, changing $K$ changes both timing and frequency, so this pilot does not yet separate their effects.
+\textbf{Pressure Plate is our more informative testbed.} Handcrafted events reached 99.3\% peak team success and fixed $K=76$ reached 100\%, while $K=38$, $K=152$, and initialization-only queries never completed the task. The sharp differences make Pressure Plate useful for studying query scheduling, although changing $K$ changes both timing and frequency.
 
-\textbf{Successful coordination can deteriorate late in training.} The $K=76$ policy maintained 100\% success from rounds 120 through 180, then fell to 0\% by round 200. Mean return remained high, decreasing only from 307.7 to 305.2. In all 40 sampled final episodes, every agent had visited the goal, but agents left before all three could finish together. Since rewards emphasize first arrivals while success requires simultaneous goal occupancy, this suggests a mismatch worth investigating. The traces identify the failing behavior, but do not yet establish why continued training produces it.
+\textbf{Basic learned gates did not complete Pressure Plate.} Both remained at 0\% success across all monitored evaluations throughout the full training budget. At the final checkpoint, they queried 117.4 and 106.7 times per episode, respectively, versus 3.1 for handcrafted events and 3.0 for $K=76$. In 40 sampled final coverage episodes, exactly two agents ever reached the goal in every episode. The plain gate had only one goal visitor in 27 of 40 samples. These policies made partial progress without learning complete team coordination.
 
-\textbf{Navigation is less sensitive in this pilot.} All schedules reached peak success between 79.8\% and 86.7\%; even initialization-only queries reached 79.8\%. Handcrafted events reached 85.2\%, compared with 86.7\% for fixed $K=100$. Navigation remains a useful secondary check, but Pressure Plate provides a clearer setting in which query decisions appear consequential. Neither environment currently shows a clear advantage for handcrafted timing over a well-chosen periodic schedule. These observations still require confirmation across training seeds.
+\textbf{Failure to learn differs from late degradation.} The $K=76$ policy maintained 100\% success from rounds 120 through 180, then fell to 0\% by round 200 while mean return decreased only from 307.7 to 305.2. In all 40 sampled final episodes, every agent had visited the goal, but they failed to remain there together. This suggests a mismatch between first-arrival rewards and simultaneous completion. Its role in causing the training decline remains untested.
+
+\textbf{Navigation was less sensitive.} All schedules peaked at 79.8--86.7\% success, including 79.8\% with initialization-only queries. It remains a useful secondary check, while Pressure Plate is the priority for studying query decisions.
 
 \section{Implications and Possible Next Steps}
 
-A likely next step is to investigate the late deterioration in Pressure Plate and test ways to preserve successful coordination. Any changes to the task or reward would be evaluated separately from the original setup. We would then explore event-free models that learn query decisions jointly with behavior generation. Periodic and matched-count random schedules would help test whether learned timing improves learning speed, stability, or query cost. The gate architecture and training mechanism remain open; the pilot suggests prioritizing Pressure Plate when making those design choices.
+Possible next steps include examining reward--completion alignment and whether gate initialization or frequent refreshing prevents stable coordination. Frequency-matched controls could help separate learned timing from query frequency before further event-free model design. Any task or reward changes would be evaluated separately. These pilots do not establish a cause of failure or robustness across seeds.
 
 \begin{thebibliography}{1}
 \bibitem[B\"uchi et~al.(2026)]{buchi2026events}
@@ -82,23 +84,25 @@ B\"uchi, H., Flageat, M., Sebasti\'an, E., and Prorok, A.
 \section{Pilot Results}
 \label{app:results}
 
-All results use training seed 42. \emph{Peak} is the highest success observed across monitored evaluations, not an independent held-out test score. Success requires all three agents to occupy the goal simultaneously in Pressure Plate and all four agents to collect their targets in Navigation. Step counts and query counts refer to the earliest peak.
+All results use training seed 42. \emph{Peak} is the highest success observed within the common training budget, not an independent held-out test score. Success requires all three agents to occupy the goal simultaneously in Pressure Plate and all four agents to collect their targets in Navigation. \emph{Peak round} is the first round attaining a positive peak; a dash indicates no successful team episode at any evaluated point. Final success and query counts are measured at the common final round within each environment. Query counts include initialization.
 
 \begin{table}[ht]
 \centering
 \small
 \setlength{\tabcolsep}{5pt}
-\caption{Pressure Plate. Queries are team refreshes per episode, including initialization; each refresh updates all three agents. A dash indicates no successful team episode at any evaluated point.}
+\caption{Pressure Plate: all settings train for 200 rounds. Final $Q$ is the mean number of team queries per episode at round 200; each query updates all three agents. Both learned gates use zero query penalty ($\lambda=0$).}
 \label{tab:pp}
-\begin{tabular}{lrrrrrr}
+\begin{tabular}{lrrrr}
 \toprule
-Schedule & Peak (\%) & Final (\%) & Round & Valid M & Simulator M & Queries \\
+Schedule & Peak (\%) & Final (\%) & Peak round & Final $Q$ \\
 \midrule
-Handcrafted event & 99.30 & 18.98 & 130 & 3.204 & 3.328 & 3.13 \\
-Fixed $K=38$      & 0.00 & 0.00 & -- & -- & -- & -- \\
-Fixed $K=76$      & \textbf{100.00} & 0.00 & 120 & 2.879 & 3.072 & 2.00 \\
-Fixed $K=152$     & 0.00 & 0.00 & -- & -- & -- & -- \\
-Single query      & 0.00 & 0.00 & -- & -- & -- & -- \\
+Handcrafted event & 99.30 & 18.98 & 130 & 3.09 \\
+Fixed $K=38$      & 0.00 & 0.00 & -- & 6.00 \\
+Fixed $K=76$      & \textbf{100.00} & 0.00 & 120 & 3.00 \\
+Fixed $K=152$     & 0.00 & 0.00 & -- & 2.00 \\
+Single query      & 0.00 & 0.00 & -- & 1.00 \\
+Learned gate ($\lambda=0$) & 0.00 & 0.00 & -- & 117.39 \\
+Coverage gate ($\lambda=0$) & 0.00 & 0.00 & -- & 106.71 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -107,25 +111,23 @@ Single query      & 0.00 & 0.00 & -- & -- & -- & -- \\
 \centering
 \small
 \setlength{\tabcolsep}{5pt}
-\caption{Navigation. Queries are adapter queries per agent per episode, including initialization. The $K=100$ peak has 96.56\% individual target collection and 86.72\% full-team success.}
+\caption{Navigation: all settings train for 400 rounds. Final $Q$ counts adapter queries per agent per episode at round 400. The $K=100$ peak has 96.56\% individual target collection and 86.72\% full-team success.}
 \label{tab:nav}
-\begin{tabular}{lrrrrrr}
+\begin{tabular}{lrrrr}
 \toprule
-Schedule & Peak (\%) & Final (\%) & Round & Valid M & Simulator M & Queries \\
+Schedule & Peak (\%) & Final (\%) & Peak round & Final $Q$ \\
 \midrule
-Handcrafted event & 85.16 & 76.56 & 150 & 2.752 & 3.840 & 1.77 \\
-Fixed $K=25$      & 85.94 & 74.84 & 175 & 3.417 & 4.480 & 5.04 \\
-Fixed $K=50$      & 82.11 & 63.28 & 50  & 1.182 & 1.280 & 2.78 \\
-Fixed $K=100$     & \textbf{86.72} & 75.08 & 200 & 3.711 & 5.120 & 1.61 \\
-Single query      & 79.77 & 74.14 & 250 & 4.529 & 6.400 & 1.00 \\
+Handcrafted event & 85.16 & 76.56 & 150 & 1.75 \\
+Fixed $K=25$      & 85.94 & 74.84 & 175 & 5.07 \\
+Fixed $K=50$      & 82.11 & 63.28 & 50  & 2.83 \\
+Fixed $K=100$     & \textbf{86.72} & 75.08 & 200 & 1.51 \\
+Single query      & 79.77 & 74.14 & 250 & 1.00 \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-\noindent\textit{Step counts.} M denotes one million environment steps. Valid steps exclude transitions after episode completion that are not used for training; simulator steps count all vectorized slots.
 
 \paragraph{Reproducibility.}
-Each schedule was trained from scratch with 128 parallel environments and a 200-step horizon. Pressure Plate used 200 training rounds and Navigation 400. Evaluation occurred every 10 and 25 rounds, respectively, using the same 1,280 seeded episodes with random states isolated from training. Navigation retained Neural Manifold Diversity (NMD) control; Pressure Plate used no diversity control. Source and configuration snapshots are preserved. Cross-seed robustness has not yet been evaluated.
+Each condition was trained from scratch with 128 parallel environments and a 200-step horizon: 200 rounds for Pressure Plate and 400 for Navigation. Evaluation occurred every 10 and 25 rounds, respectively, on the same 1,280 seeded episodes with random states isolated from training. Navigation retained Neural Manifold Diversity (NMD) control; Pressure Plate used no diversity control. The gate reads joint observations and time since the last query. Coverage mixes its learned Bernoulli policy with Bernoulli(0.5), using a fixed weight of 0.2 during training and zero during evaluation. Actor/generator rewards match the baseline objective ($\lambda=0$). Source and configuration snapshots are preserved; cross-seed robustness remains untested.
 
 \input{AI_Use_Disclosure}
 
