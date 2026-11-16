@@ -1,0 +1,71 @@
+{
+  "observed_at_utc": "2026-11-16T22:31:35.094046+00:00",
+  "status_at_observation": "both_running",
+  "source_commit": "3dff3aaf6db7f5bc1f5122da7c9a5304e070383b",
+  "local_batch": "runs/gate_lambda0_2026-11-16/batch",
+  "launcher": "local.cs238.gates.lambda0.20261116",
+  "query_cost": 0.0,
+  "training_from_scratch": true,
+  "seed": 42,
+  "planned_rounds_per_run": 200,
+  "num_envs": 128,
+  "horizon": 200,
+  "evaluation_episodes": 1280,
+  "evaluation_interval": 10,
+  "parallel_workers": 2,
+  "baseline_config_comparison": "Identical to status-update event condition after removing the new query_gate section.",
+  "older_cost_aware_processes": "All four verified stopped with SIGSTOP; original recorded progress remains intact.",
+  "observations": [
+    {
+      "run": "pressure_plate_coverage_gate_lambda0_seed42",
+      "observed_training_round": 15,
+      "recent_round_seconds": [
+        4.253,
+        4.257,
+        4.261,
+        4.286,
+        4.236
+      ],
+      "evaluation_seconds": [
+        {
+          "round": 0,
+          "seconds": 20.891642207978293
+        },
+        {
+          "round": 10,
+          "seconds": 16.403647957951762
+        }
+      ],
+      "zero_query_penalty_verified": true,
+      "initial_actor_generator_critic_match_baseline_exactly": true,
+      "max_actor_pre_update_log_prob_mse": 1.5039312229923017e-14,
+      "max_gate_pre_update_log_prob_mse": 0.0
+    },
+    {
+      "run": "pressure_plate_learned_gate_lambda0_seed42",
+      "observed_training_round": 15,
+      "recent_round_seconds": [
+        4.274,
+        4.251,
+        4.279,
+        4.313,
+        4.859
+      ],
+      "evaluation_seconds": [
+        {
+          "round": 0,
+          "seconds": 20.93192270898726
+        },
+        {
+          "round": 10,
+          "seconds": 15.95377683301922
+        }
+      ],
+      "zero_query_penalty_verified": true,
+      "initial_actor_generator_critic_match_baseline_exactly": true,
+      "max_actor_pre_update_log_prob_mse": 1.2479167005308156e-14,
+      "max_gate_pre_update_log_prob_mse": 0.0
+    }
+  ],
+  "note": "Startup observation, not a final performance result or live status."
+}
