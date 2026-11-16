@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "query_cost": 0.0,
+  "evaluation_frequency_invariance": "exact_all_four_parameter_trees",
+  "cases": [
+    {
+      "mode": "learned",
+      "eval_interval": 1,
+      "rounds": 2,
+      "max_actor_replay_mse": 0.0,
+      "max_gate_replay_mse": 0.0
+    },
+    {
+      "mode": "learned",
+      "eval_interval": 2,
+      "rounds": 2,
+      "max_actor_replay_mse": 0.0,
+      "max_gate_replay_mse": 0.0
+    },
+    {
+      "mode": "coverage",
+      "eval_interval": 1,
+      "rounds": 2,
+      "max_actor_replay_mse": 0.0,
+      "max_gate_replay_mse": 0.0
+    },
+    {
+      "mode": "coverage",
+      "eval_interval": 2,
+      "rounds": 2,
+      "max_actor_replay_mse": 0.0,
+      "max_gate_replay_mse": 0.0
+    }
+  ]
+}

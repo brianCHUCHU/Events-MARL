@@ -1,0 +1,7 @@
+{
+  "unit_tests_passed": 38,
+  "real_environment_integrity_cases": 4,
+  "query_cost": 0.0,
+  "zero_cost_rewards": "Actor/generator GAE exactly matches original reward scaling and clipping, with unchanged dtype; tested at reward scales 0.5, 1 and 2.",
+  "earlier_nonzero_behavior": "Preserved; tested against the existing cost-aware reward calculation."
+}

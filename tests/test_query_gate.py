@@ -12,12 +12,34 @@ from flax.training import train_state
 
 from hyperlora.config import load_config
 from hyperlora.training.query_gate import (QueryGate, LearnedPressurePlateEvents,
-    bernoulli_log_prob, gate_distribution, gate_update)
+    bernoulli_log_prob, gate_distribution, gate_update, query_learning_rewards)
+from hyperlora.training.gae import compute_gae
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class QueryGateTest(unittest.TestCase):
+    def test_lambda_zero_preserves_baseline_reward_scaling_clipping_and_gae_exactly(self):
+        raw=np.array([[300.,2.,-30.,-4.,5.,6.],[1.,-2.,3.,-4.,50.,6.]],dtype=np.float32)
+        q=np.array([[True,False],[False,True]])
+        zero=query_learning_rewards(raw,q,0,3)
+        self.assertEqual(zero.dtype,raw.dtype)
+        np.testing.assert_array_equal(zero.reshape(raw.shape),raw)
+        values=np.zeros((2,2,3),dtype=np.float32)
+        for scale in (.5,1.,2.):
+            kwargs=dict(gamma=.99,gae_lambda=.95,reward_scale=scale,num_envs=2,
+                        num_agents=3,current_num_agents=3,advantage_clip_range=10,
+                        mixed_agent_training=False,valid_steps=np.ones((2,2),dtype=bool))
+            a=compute_gae(raw,values,np.zeros((2,6),dtype=bool),**kwargs)
+            b=compute_gae(zero,values,np.zeros((2,6),dtype=bool),**kwargs)
+            for aa,bb in zip(a,b):np.testing.assert_array_equal(aa,bb)
+
+    def test_nonzero_query_penalty_keeps_the_existing_cost_aware_reward(self):
+        raw=np.array([[300.,-20.,2.,3.,4.,5.]],dtype=np.float32)
+        q=np.array([[True,False]])
+        np.testing.assert_array_equal(query_learning_rewards(raw,q,.01,3),
+            np.clip(raw.reshape(1,2,3),-10,10)-.01*q[...,None])
+
     def config(self, mode="coverage", **overrides):
         return load_config(ROOT / "configs/main/ours/pressure_plate.yaml", {
             "research_metrics": True, "env.num_envs": 2, "ppo.rollout_steps": 8,

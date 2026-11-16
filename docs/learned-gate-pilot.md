@@ -5,6 +5,13 @@ It borrows the centralized query-policy and exploration-mixture idea from
 `Qz07/event-free-MARL` at commit `f76b6d8`, implemented here in Flax/JAX.
 The teammate's custom discrete grid environment is not used.
 
+**Current primary comparison:** the user requested zero query penalty for a
+direct comparison with the status-update schedules. Run `learned_gate_lambda0`
+and `coverage_gate_lambda0`, both with `query_gate.query_cost=0.0`. These start
+from scratch on seed 42, not from the earlier penalized policies. The earlier
+`learned_gate` and `coverage_gate` runs (cost 0.01) are paused in memory and
+retained in their separate batch; their results must not be pooled with these.
+
 ## Conditions and comparison
 
 Both conditions train seed **42**, 200 rounds, 128 environments and a 200-step
@@ -34,15 +41,21 @@ the cached adapter/context explicitly into the gate.
 
 ## Objective and evaluation
 
-The gate, actor and generator learn from the same reward: the existing clipped
-task reward minus **0.01 per additional team query**. The cost is charged to
-each agent's identical shared reward; team averaging therefore charges 0.01,
-not 0.03. Raw rewards, returns, completion and query counts remain separately
-logged. The existing GAE return/advantage clipping remains active. This is a
-query-penalized method objective, so fixed/event baselines optimize a different
-cost-free objective. A cost sweep or zero-cost control would be a later ablation.
-Unlike the teammate prototype, we do not give the actor an unpenalized reward
-while training the gate on the penalized reward.
+For the **lambda-zero primary comparison**, actor/generator GAE receives the
+original per-agent task rewards, preserving their dtype, reward scaling and
+clipping order exactly as in the fixed/event baselines. The gate receives the
+team mean reward and its own scalar GAE. No query penalty is applied to either.
+The original scenario includes shared task bonuses and individual shaping;
+per-agent rewards need not be identical. The existing GAE return/advantage
+clipping remains active. Separate tests check zero-cost actor returns and
+advantages against baseline GAE, including rewards above the clipping limits.
+
+The **paused cost-aware pilot** instead charges 0.01 per additional team query
+to each agent's learning reward, after raw reward clipping; team averaging
+therefore charges 0.01, not 0.03. Actor/generator and gate all receive that
+penalty. Raw evaluation rewards remain unchanged. This optimizes a different
+query-penalized objective from the status-update baselines and is retained as
+a separate experiment, not the primary comparison.
 
 Every 10 rounds, and before training, evaluate 1,280 episodes with the same
 reset seeds as the earlier baseline pilot. Actor actions are `tanh(mean)`;
@@ -76,10 +89,10 @@ exact optimizer-state resume. Only load trusted local checkpoints.
 
 ```bash
 PYTHONPATH=src python -m unittest discover -s tests -v
-PYTHONPATH=src python scripts/validate_learned_gate.py --out runs/new_gate_checks
+PYTHONPATH=src python scripts/validate_learned_gate.py --query-cost 0 --out runs/new_gate_checks
 python scripts/benchmark_learned_gate.py --out runs/new_gate_benchmark --workers 2
 python scripts/run_query_experiments.py --scenario pressure_plate --seeds 42 \
-  --schedules learned_gate coverage_gate --workers 2 --out runs/new_gate_batch
+  --schedules learned_gate_lambda0 coverage_gate_lambda0 --workers 2 --out runs/new_gate_batch
 ```
 
 The short validator checks real environment execution, initial generation,

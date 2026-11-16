@@ -33,6 +33,10 @@ PRESSURE_PLATE = {
 PRESSURE_PLATE_GATES = {
     "learned_gate": ("query_gate.mode=learned", "evaluation.eval_interval=10"),
     "coverage_gate": ("query_gate.mode=coverage", "evaluation.eval_interval=10"),
+    "learned_gate_lambda0": ("query_gate.mode=learned", "query_gate.query_cost=0.0",
+                             "evaluation.eval_interval=10"),
+    "coverage_gate_lambda0": ("query_gate.mode=coverage", "query_gate.query_cost=0.0",
+                              "evaluation.eval_interval=10"),
 }
 
 

@@ -40,6 +40,15 @@ def bernoulli_log_prob(probability, action):
     return jnp.where(action, jnp.log(probability), jnp.log1p(-probability))
 
 
+def query_learning_rewards(raw_rewards, queries, query_cost, num_agents):
+    raw = np.asarray(raw_rewards).reshape(*queries.shape, num_agents)
+    if query_cost == 0:
+        # Let the existing GAE perform reward scaling and clipping exactly as
+        # it does for the fixed/event baselines, preserving dtype and order.
+        return raw
+    return np.clip(raw, -10, 10) - query_cost * queries[..., None]
+
+
 @jax.jit
 def gate_inference(state, inputs, key, epsilon):
     logits, values = state.apply_fn({"params": state.params}, inputs)

@@ -1,0 +1,18 @@
+{
+  "paused_at_utc": "2026-11-16T22:27:00.607552+00:00",
+  "mechanism": "SIGSTOP verified dedicated process group",
+  "query_cost": 0.01,
+  "note": "In-memory state is retained while these processes and the host remain alive. Do not use the batch runner resume flag to restart partial runs.",
+  "status": "paused_at_user_request",
+  "local_batch": "runs/gate_pilot_2026-11-16/batch",
+  "runs": [
+    {
+      "name": "pressure_plate_coverage_gate_seed42",
+      "last_recorded_training_round": 55
+    },
+    {
+      "name": "pressure_plate_learned_gate_seed42",
+      "last_recorded_training_round": 56
+    }
+  ]
+}

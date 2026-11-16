@@ -1,6 +1,9 @@
 # Pressure Plate gate pilots, seed 42
 
 Both full-budget runs were launched concurrently after the consistency checks.
+They are now **paused at the user request** in favor of the lambda-zero
+primary comparison. See `pause_manifest.json`; the old launch manifest is
+historical. The existing stopped processes retain their in-memory state.
 `launch_manifest.json` is a timestamped launch observation, not a live status file.
 The gate and coverage share the original VMAS simultaneous-goal task and each
 train for 200 rounds (5.12M simulator steps). See

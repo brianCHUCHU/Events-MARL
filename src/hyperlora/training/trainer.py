@@ -354,7 +354,8 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
     models = build_models(config, obs_dim, action_dim, num_agents)
     gate_enabled = config.query_gate.mode != "disabled"
     if gate_enabled:
-        from .query_gate import QueryGate, LearnedPressurePlateEvents, update_gate
+        from .query_gate import (QueryGate, LearnedPressurePlateEvents, update_gate,
+                                 query_learning_rewards)
 
         gate = QueryGate(config.query_gate.hidden_dim)
         gate_params = gate.init(jax.random.fold_in(jax.random.PRNGKey(config.seed), 9000),
@@ -487,15 +488,14 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
         if gate_enabled:
             gate_data = events.arrays()
             cost = config.query_gate.query_cost * gate_data["query"][..., None]
-            # Preserve baseline clipping scale; charge refresh cost after raw
-            # reward clipping so a large arrival bonus cannot erase its cost.
-            learning_rewards = (np.clip(np.asarray(traj.rewards).reshape(
-                config.ppo.rollout_steps, num_envs, num_agents), -10, 10) - cost)
+            learning_rewards = query_learning_rewards(
+                traj.rewards, gate_data["query"], config.query_gate.query_cost, num_agents)
             gate_update_started = time.perf_counter()
             models.gate_state, gate_metrics = update_gate(
                 config, models.gate_state, events, learning_rewards.mean(-1), traj.dones, episode)
             gate_metrics.update(gate_ppo_wall_seconds=time.perf_counter()-gate_update_started,
                                 gate_total_query_cost=float(cost.sum()),
+                                gate_query_cost_weight=config.query_gate.query_cost,
                                 gate_valid_decisions=int(gate_data["valid"].sum()))
 
         advantages, returns, old_values = compute_gae(

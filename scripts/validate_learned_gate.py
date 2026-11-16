@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", required=True, type=Path)
+    parser.add_argument("--query-cost", type=float, default=0.01)
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=False)
     checks = []
@@ -26,6 +27,7 @@ def main():
                        "configs/main/ours/pressure_plate.yaml", "--out", str(path.resolve()),
                        "--seed", "42"]
             for override in ("research_metrics=True", f"query_gate.mode={mode}",
+                             f"query_gate.query_cost={args.query_cost}",
                              "env.num_envs=4", "ppo.num_episodes=2", "ppo.rollout_steps=8",
                              "ppo.num_minibatches=2", "evaluation.num_eval_episodes=1",
                              "evaluation.max_eval_steps=8", f"evaluation.eval_interval={interval}"):
@@ -40,6 +42,9 @@ def main():
             assert len(train) == 2
             assert max(r["pre_update_log_prob_mse"] for r in train) <= 1e-6
             assert max(r["gate_pre_update_log_prob_mse"] for r in train) <= 1e-6
+            assert all(r["gate_query_cost_weight"] == args.query_cost for r in train)
+            if args.query_cost == 0:
+                assert all(r["gate_total_query_cost"] == 0 for r in train)
             expected_epsilon = .2 if mode == "coverage" else 0
             assert all(r["gate_coverage_epsilon"] == expected_epsilon for r in train)
             assert all(r["evaluation_coverage_epsilon"] == 0 for r in metrics if r.get("eval"))
@@ -68,7 +73,8 @@ def main():
         for a,b in zip(jax.tree.leaves(finals[0]),jax.tree.leaves(finals[1])):
             np.testing.assert_array_equal(a,b)
     (args.out / "checks.json").write_text(json.dumps(dict(
-        passed=True, evaluation_frequency_invariance="exact_all_four_parameter_trees",cases=checks),indent=2)+"\n")
+        passed=True, query_cost=args.query_cost,
+        evaluation_frequency_invariance="exact_all_four_parameter_trees",cases=checks),indent=2)+"\n")
 
 
 if __name__ == "__main__":
