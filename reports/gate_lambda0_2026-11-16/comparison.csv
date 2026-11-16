@@ -1,0 +1,8 @@
+schedule,title,peak_success_percent,peak_round,final_success_percent,final_queries_per_episode,final_team_return
+event,Handcrafted event,99.296875,130,18.984375,3.08515625,306.1291112779388
+fixed_38,Fixed K=38,0.0,,0.0,6.0,210.9659717047491
+fixed_76,Fixed K=76,100.0,120,0.0,3.0,305.23656397691417
+fixed_152,Fixed K=152,0.0,,0.0,2.0,197.67948688875035
+single,Single query,0.0,,0.0,1.0,115.12229180515173
+learned_gate_lambda0,"Learned gate, lambda=0",0.0,,0.0,117.38515625,123.45146931987487
+coverage_gate_lambda0,"Coverage gate, lambda=0",0.0,,0.0,106.71484375,199.01199454285597

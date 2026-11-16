@@ -1,5 +1,10 @@
 # Pressure Plate gate pilots with lambda = 0
 
+**Completed:** both seed-42 runs finished. Neither gate completed the full task
+at any evaluated checkpoint. See [results and interpretation](RESULTS.md),
+`comparison.csv`, and `comparison.png` for the comparison with the earlier
+status-update baselines. The two concurrent runs took approximately 24.4 minutes.
+
 Primary comparison against the November 16 status-update baselines. Both
 centralized gate variants train from scratch on seed 42, with zero query
 penalty. The actor/generator retain the baseline task-reward objective.
@@ -16,4 +21,4 @@ is reused. See [the full protocol](../../docs/learned-gate-pilot.md).
 
 `integrity_checks.json` and `verification_summary.json` describe execution
 checks, not convergence results. A launch manifest records startup only.
-After completion the local runner writes `summary.csv` and `seed_summary.csv`.
+The local runner wrote `summary.csv` and `seed_summary.csv` on completion.
