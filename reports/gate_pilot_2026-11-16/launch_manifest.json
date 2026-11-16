@@ -1,0 +1,46 @@
+{
+  "observed_at_utc": "2026-11-16T22:23:04.880137+00:00",
+  "status_at_observation": "both_running",
+  "source_commit": "ca208b65c3d29e063f9ee23c6a0dac6e2bd36fed",
+  "local_batch": "runs/gate_pilot_2026-11-16/batch",
+  "launcher": "local.cs238.gates.20261116",
+  "seed": 42,
+  "environment": "pressure_plate",
+  "planned_rounds_per_run": 200,
+  "num_envs": 128,
+  "horizon": 200,
+  "evaluation_interval": 10,
+  "evaluation_episodes": 1280,
+  "parallel_workers": 2,
+  "initial_query": "mandatory",
+  "completion_condition": "all_three_agents_at_goal_simultaneously",
+  "observations": [
+    {
+      "run": "pressure_plate_coverage_gate_seed42",
+      "observed_training_round": 11,
+      "recent_training_seconds": [
+        3.667,
+        2.953,
+        2.302
+      ],
+      "initial_evaluation_seconds": 19.21398825000506,
+      "initial_evaluation_episodes": 1280,
+      "max_actor_pre_update_log_prob_mse": 1.9512112059546713e-14,
+      "max_gate_pre_update_log_prob_mse": 0.0
+    },
+    {
+      "run": "pressure_plate_learned_gate_seed42",
+      "observed_training_round": 10,
+      "recent_training_seconds": [
+        3.746,
+        3.708,
+        3.385
+      ],
+      "initial_evaluation_seconds": 19.215121374931186,
+      "initial_evaluation_episodes": 1280,
+      "max_actor_pre_update_log_prob_mse": 1.3707895021451873e-14,
+      "max_gate_pre_update_log_prob_mse": 0.0
+    }
+  ],
+  "note": "Launch observation only. These short prefixes do not establish convergence; final results remain pending."
+}
