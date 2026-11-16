@@ -113,7 +113,8 @@ ADAPTERS = {
     "navigation": EnvAdapter(
         build_tokens=_navigation_tokens,
         make_events=lambda config, num_envs, num_agents, obs_dim, episode, ema: NavigationEvents(
-            num_envs, num_agents, config.model.adaptive_hypernetwork, obs_dim),
+            num_envs, num_agents, config.model.adaptive_hypernetwork, obs_dim,
+            research=config.research_metrics, interval=config.model.query_interval),
         nmd=_navigation_nmd,
         buffer_token_fields=("lidar",),
         apply_capabilities=_apply_capabilities,

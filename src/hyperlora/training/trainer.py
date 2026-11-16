@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -18,7 +19,7 @@ from ..algorithms.ps import make_train_step as make_ps_train_step, zero_adapters
 from ..config import Config
 from ..diversity.control import (alpha_broadcast, alpha_from_ema, alpha_mean_over_envs,
                                  episode_target, update_ema)
-from ..diversity.nmd import calculate_nmd
+from ..diversity.nmd import buffer_entries, calculate_nmd
 from ..diversity.sampler import build_sampler
 from ..envs.adapters import get_adapter
 from ..envs.capabilities import initial_capabilities, sample_capabilities, sample_team_size
@@ -28,6 +29,7 @@ from ..evaluation import actions as eval_actions
 from ..evaluation.quantitative import run_quantitative_evaluation
 from ..envs.curriculum import STAGE_KWARGS, football_stage
 from ..envs.factory import make_env, team_size
+from ..logging.diagnostics import RolloutTrace, environment_manifest
 from ..logging.jsonl import RunLogger
 from ..diversity.snd_dico import calculate_snd_dico, dico_scaling
 from ..models import CentralizedCritic, Hypernetwork, LoRAPolicy
@@ -44,28 +46,34 @@ from .rollout import collect_rollout, collect_rollout_recurrent
 
 
 def _initial_buffer_entries(tokens, fields: tuple, num_envs: int, active_agents: int) -> list:
-    entries = []
-    for env_idx in range(num_envs):
-        for agent_idx in range(active_agents):
-            entry = {"task": None, "context": None, "lidar": None, "target_nmd": None,
-                     "query_type": "initial", "hidden_state": None, "agent_idx": agent_idx}
-            for name in fields:
-                value = getattr(tokens, name)
-                entry[name] = None if value is None else value[env_idx][agent_idx]
-            entries.append(entry)
-    return entries
+    return buffer_entries(tokens, fields, num_envs, active_agents)
+
+
+def _nmd_observations(trajectory, num_agents: int) -> list:
+    if not trajectory.active_envs:
+        return trajectory.obs
+    active = np.repeat(np.asarray(trajectory.active_envs).reshape(-1), num_agents)
+    return [jnp.concatenate(trajectory.obs, axis=0)[active]]
 
 
 def _token_batches(token_rows: list, tokens, num_batches: int, num_envs: int,
-                   num_agents: int) -> dict:
+                   num_agents: int, use_transition_tokens=False) -> dict:
     batch = {}
-    for name in ("context", "lidar", "agent_positions", "env_context"):
+    varying = ("context", "lidar", "agent_positions", "env_context")
+    if use_transition_tokens:
+        varying += ("task", "target_nmd")
+    for name in varying:
         if token_rows[0][name] is None:
             batch[name] = None
             continue
         flat = jnp.concatenate([row[name] for row in token_rows], axis=0)
         batch[name] = flat.reshape(num_batches * num_envs, num_agents, -1)
+    if "generation_lidar" in token_rows[0]:
+        batch["generation_lidar"] = jnp.concatenate(
+            [row["generation_lidar"] for row in token_rows], axis=0)
     for name in ("task", "target_nmd"):
+        if name in batch:
+            continue
         value = getattr(tokens, name)
         batch[name] = None if value is None else jnp.tile(
             value[None, :, :, :], (num_batches, 1, 1, 1)).reshape(
@@ -179,7 +187,7 @@ def build_models(config: Config, obs_dim: int, action_dim: int, num_agents: int)
         use_shared_value=model.use_shared_critic,
     )
 
-    rng = jax.random.PRNGKey(0)
+    rng = jax.random.PRNGKey(config.seed if config.research_metrics else 0)
     rng, policy_rng, hn_rng, critic_rng = jax.random.split(rng, 4)
 
     dummy_obs = jnp.ones((1, obs_dim))
@@ -336,6 +344,9 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
     num_agents = team_size(config.env)
     env = make_env(config.env, initial_capabilities(config.env))
     obs = env.reset()
+    if config.research_metrics:
+        (log_dir / "environment.json").write_text(
+            json.dumps(environment_manifest(config, env), indent=2, allow_nan=False) + "\n")
     obs_dim = obs[0].shape[-1]
     action_dim = _action_dim(config, env)
 
@@ -357,9 +368,28 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
     previous_trajectory_obs = None
     value_clip_range = config.ppo.ppo_clip_epsilon if config.ppo.clip_value_loss else None
 
+    def research_evaluate(rounds, environment_steps):
+        from ..evaluation.research import evaluate
+
+        metrics = evaluate(config, adapter, models, hn_apply, policy_outputs, nmd_ema,
+                           rounds, log_dir / "evaluation_traces", environment_steps)
+        logger.log({"episode": rounds - 1, "eval": True, **metrics})
+        save_checkpoint(checkpoint_dir / f"evaluated_round_{rounds:04d}.npz",
+                        policy_params=models.policy_state.params, critic_params=models.critic_state.params,
+                        hn_params=models.hn_state.params, episode=rounds, nmd_ema=nmd_ema)
+
+    if config.research_metrics:
+        @jax.jit
+        def policy_outputs(params, observations, adapters):
+            mean, log_std = models.policy.apply({"params": params}, observations, adapters)
+            return mean, jnp.maximum(jnp.exp(log_std), models.policy.min_std)
+
+        research_evaluate(0, 0)
+
     curriculum_stage = None
+    environment_steps = 0
     for episode in range(config.ppo.num_episodes):
-        started = time.time()
+        started, cpu_started = time.perf_counter(), time.process_time()
         buffer: list = []
 
         stage, stage_kwargs = _curriculum_kwargs(config, episode)
@@ -386,7 +416,9 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
             current_num_agents if config.env.mixed_agent_training else num_agents))
 
         nmd = None
-        if diversity.use_adapter_nmd and buffer:
+        nmd_input_contexts = 0
+        if diversity.use_adapter_nmd and buffer and previous_trajectory_obs is not None:
+            nmd_input_contexts = min(len(buffer), diversity.adapter_nmd_sample_size)
             nmd = adapter.nmd(
                 buffer=buffer, config=config, hn_params=models.hn_state.params,
                 policy_params=models.policy_state.params, hypernetwork=models.hypernetwork,
@@ -407,16 +439,34 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
                                      episode, nmd_ema)
         events.prime(obs)
 
+        num_envs = config.env.num_envs
+        rounds = episode + 1
+        final_round = rounds == config.ppo.num_episodes
+        scheduled_eval = (config.evaluation.eval_interval
+                          and rounds % config.evaluation.eval_interval == 0
+                          and rounds >= config.evaluation.eval_start_episode)
+        trace = None
+        if config.research_metrics and (episode == 0 or scheduled_eval or final_round):
+            trace = RolloutTrace(config.env.scenario, num_envs, num_agents,
+                                 config.ppo.rollout_steps, episode * 4)
+        rollout_started = time.perf_counter()
         result = collect_rollout(
             env=env, obs=obs, policy_params=models.policy_state.params,
             critic_params=models.critic_state.params, adapters=adapters, hn_apply=hn_apply,
             tokens=tokens, events=events, get_actions=get_actions, get_value=get_value,
             config=config, num_agents=num_agents, current_num_agents=current_num_agents,
-            episode=episode, alpha=alpha, buffer=buffer,
+            episode=episode, alpha=alpha, buffer=buffer, trace=trace,
         )
         traj, obs, tokens = result.trajectory, result.obs, result.tokens
         alpha = result.alpha
-        previous_trajectory_obs = traj.obs
+        previous_trajectory_obs = _nmd_observations(traj, num_agents)
+        rollout_finished = time.perf_counter()
+        valid_steps = np.asarray(traj.active_envs) if traj.active_envs else None
+        flat_steps = None if valid_steps is None else valid_steps.reshape(-1)
+        simulator_steps = ppo_steps = config.ppo.rollout_steps * num_envs
+        if flat_steps is not None:
+            ppo_steps = int(flat_steps.sum())
+        environment_steps += ppo_steps
 
         advantages, returns, old_values = compute_gae(
             traj.rewards, [np.asarray(v) for v in traj.values], np.asarray(traj.dones),
@@ -424,7 +474,7 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
             reward_scale=config.ppo.reward_scale, num_envs=config.env.num_envs,
             num_agents=num_agents, current_num_agents=current_num_agents,
             advantage_clip_range=config.ppo.advantage_clip_range,
-            mixed_agent_training=config.env.mixed_agent_training,
+            mixed_agent_training=config.env.mixed_agent_training, valid_steps=valid_steps,
         )
 
         obs_batch = jnp.concatenate(traj.obs, axis=0)
@@ -439,12 +489,15 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
         advantages_batch = jnp.array(advantages)
         returns_batch = jnp.array(returns)
         if config.ppo.normalize_returns:
-            returns_batch, old_values = normalize_returns(returns_batch, old_values)
+            valid_agents = None if flat_steps is None else jnp.asarray(np.repeat(flat_steps, num_agents))
+            returns_batch, old_values = normalize_returns(returns_batch, old_values, valid_agents)
         old_values_batch = jnp.array(old_values)
 
         num_batches = obs_batch.shape[0] // (config.env.num_envs * num_agents)
         token_batch = _token_batches(traj.token_rows, tokens, num_batches, config.env.num_envs,
-                                     num_agents)
+                                     num_agents, use_transition_tokens=config.research_metrics)
+        action_scales = (jnp.repeat(jnp.asarray(traj.adapter_scales), num_envs)
+                         if config.research_metrics else None)
         mask_batch = None
         if tokens.mask is not None:
             expanded = jnp.tile(tokens.mask, (config.env.num_envs, 1, 1, 1))
@@ -455,17 +508,30 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
                            config.ppo.entropy_coef * (config.ppo.entropy_decay ** episode))
 
         loss_info = None
+        across_epochs = None
+        first_minibatch_log_prob_mse = None
+        ppo_updates = 0
+        ppo_input_contexts = 0
+        num_minibatches = config.ppo.num_minibatches if config.ppo.use_minibatches else 1
         for _epoch in range(config.ppo.ppo_epochs):
             shuffle_rng = None
             if config.ppo.use_minibatches and config.ppo.shuffle_minibatches:
                 models.rng, shuffle_rng = jax.random.split(models.rng)
             indices = make_indices(
                 obs_batch.shape[0], num_batches * config.env.num_envs, num_agents,
-                config.ppo.num_minibatches, config.ppo.shuffle_minibatches, shuffle_rng)
+                num_minibatches, config.ppo.use_minibatches and config.ppo.shuffle_minibatches,
+                shuffle_rng)
 
             accumulated = None
-            for mb in range(config.ppo.num_minibatches):
+            epoch_updates = 0
+            for mb in range(num_minibatches):
                 rows, env_rows = indices.slice(mb)
+                batch_valid = None
+                if flat_steps is not None:
+                    selected = flat_steps[np.asarray(env_rows)]
+                    if not selected.any():
+                        continue
+                    batch_valid = jnp.asarray(selected)
                 policy_state, hn_state, critic_state, loss_info = train_step(
                     models.policy_state, models.hn_state, models.critic_state,
                     obs_batch[rows], global_state_batch[env_rows], actions_batch[rows],
@@ -475,18 +541,77 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
                                    "env_context")),
                     None if mask_batch is None else mask_batch[env_rows],
                     config.ppo.ppo_clip_epsilon, entropy_coef, config.ppo.value_loss_coef,
-                    num_agents, current_num_agents, alpha, old_values_batch[rows],
-                    value_clip_range=value_clip_range,
+                    num_agents, current_num_agents,
+                    alpha if action_scales is None else action_scales[env_rows],
+                    old_values_batch[rows],
+                    value_clip_range=value_clip_range, valid_steps=batch_valid,
+                    generation_lidar=(token_batch["generation_lidar"][rows]
+                                      if "generation_lidar" in token_batch else None),
                 )
+                if config.research_metrics:
+                    invalid = [key for key, value in loss_info.items()
+                               if not np.isfinite(np.asarray(value)).all()]
+                    if invalid:
+                        raise FloatingPointError(f"Non-finite PPO diagnostics at round {rounds}: {invalid}")
+                    if first_minibatch_log_prob_mse is None and float(loss_info["approx_kl"]) > 1e-6:
+                        raise RuntimeError(f"Rollout/PPO log-prob mismatch before update at round {rounds}: "
+                                           f"{float(loss_info['approx_kl'])}")
                 models.policy_state, models.hn_state, models.critic_state = (
                     policy_state, hn_state, critic_state)
+                epoch_updates += 1
+                ppo_input_contexts += len(rows) if "generation_lidar" in token_batch else len(env_rows)
+                if config.research_metrics and first_minibatch_log_prob_mse is None:
+                    first_minibatch_log_prob_mse = loss_info["approx_kl"]
                 accumulated = (loss_info if accumulated is None
                                else {k: accumulated[k] + v for k, v in loss_info.items()})
-            loss_info = {k: v / config.ppo.num_minibatches for k, v in accumulated.items()}
+            ppo_updates += epoch_updates
+            loss_info = {k: v / epoch_updates for k, v in accumulated.items()}
+            if config.research_metrics:
+                across_epochs = (loss_info if across_epochs is None else
+                                 {key: across_epochs[key] + value for key, value in loss_info.items()})
 
+        instrumentation = {}
+        if config.research_metrics:
+            loss_info = {key: value / config.ppo.ppo_epochs for key, value in across_epochs.items()}
+            loss_info["pre_update_log_prob_mse"] = first_minibatch_log_prob_mse
+            jax.block_until_ready(loss_info)
+            update_finished = time.perf_counter()
+            teams_per_batch = [(step, len(set(np.asarray(idx) // num_agents)))
+                               for step, idx in traj.requery_events]
+            instrumentation = {
+                "training_round": rounds,
+                "metrics_schema_version": 2,
+                "training_environment_steps": environment_steps,
+                "training_agent_steps": environment_steps * num_agents,
+                "simulator_training_environment_steps": rounds * simulator_steps,
+                "masked_post_terminal_env_steps": simulator_steps - ppo_steps,
+                "pre_rollout_wall_seconds": rollout_started - started,
+                "rollout_wall_seconds": rollout_finished - rollout_started,
+                "update_wall_seconds": update_finished - rollout_finished,
+                "training_cpu_seconds": time.process_time() - cpu_started,
+                "team_initial_queries": num_envs,
+                "team_requeries": sum(count for _, count in teams_per_batch),
+                "generator_rollout_batches": 1 + len(teams_per_batch),
+                "generator_setup_batches": 1 + int(diversity.use_diversity_control
+                                                    and nmd is not None and np.isfinite(nmd)),
+                "generator_ppo_batches": ppo_updates,
+                "generator_setup_input_contexts": num_envs * (1 + int(
+                    diversity.use_diversity_control and nmd is not None and np.isfinite(nmd))),
+                "generator_refresh_input_contexts": sum(c for c, _ in traj.generator_refresh_sizes),
+                "generator_refresh_generated_adapters": sum(a for _, a in traj.generator_refresh_sizes),
+                "generator_ppo_input_contexts": ppo_input_contexts,
+                "generator_ppo_generated_adapters": ppo_input_contexts * num_agents,
+                "generator_nmd_input_contexts": nmd_input_contexts,
+                "team_requery_batches": teams_per_batch,
+                "agent_initial_queries": num_envs * num_agents,
+                "agent_requeries": sum(len(idx) for _, idx in traj.requery_events),
+                "first_terminal_fraction": float(np.asarray(traj.dones).any(axis=0).mean()),
+            }
         logger.log({
             "episode": episode,
-            "avg_reward": float(np.mean(traj.episode_rewards)),
+            **instrumentation,
+            "avg_reward": (float(np.asarray(traj.rewards).sum() / (ppo_steps * num_agents))
+                           if flat_steps is not None else float(np.mean(traj.episode_rewards))),
             "nmd": nmd,
             "alpha": alpha,
             "nmd_ema": nmd_ema,
@@ -497,14 +622,20 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
             "team_size": current_num_agents,
             "requeries": sum(len(idx) for _, idx in traj.requery_events),
             "resets": traj.num_resets,
-            "seconds": round(time.time() - started, 3),
+            "seconds": round(time.perf_counter() - started, 3),
             **{k: float(v) for k, v in loss_info.items()},
         })
 
-        _maybe_evaluate(config, episode, env, logger, models=models, adapter=adapter,
-                        num_agents=num_agents, obs_dim=obs_dim, nmd_ema=nmd_ema,
-                        actions_fn=eval_actions_fn, tokens_fn=eval_tokens_fn,
-                        after_step_fn=eval_after_step_fn)
+        if trace is not None:
+            trace.save(log_dir / "training_traces" / f"round_{rounds:04d}.npz")
+        if config.research_metrics:
+            if scheduled_eval or final_round:
+                research_evaluate(rounds, environment_steps)
+        else:
+            _maybe_evaluate(config, episode, env, logger, models=models, adapter=adapter,
+                            num_agents=num_agents, obs_dim=obs_dim, nmd_ema=nmd_ema,
+                            actions_fn=eval_actions_fn, tokens_fn=eval_tokens_fn,
+                            after_step_fn=eval_after_step_fn)
 
         if config.logging.save_interval and episode and episode % config.logging.save_interval == 0:
             save_checkpoint(checkpoint_dir / f"checkpoint_{episode}.npz",

@@ -34,26 +34,36 @@ def make_train_step(shared_policy, hypernetwork, critic, adapter_regularization_
         diversity_scaling=1.0,
         old_values_batch=None,
         value_clip_range=None,
+        valid_steps=None,
+        generation_lidar=None,
     ):
         def loss_fn(policy_params, hn_params, critic_params):
             adapters_dict = hypernetwork.apply(
                 {"params": hn_params},
                 task_batch,
                 context_batch,
-                lidar_batch,
+                lidar_batch if generation_lidar is None else generation_lidar,
                 None,
                 agent_position_batch,
                 target_nmd_batch,
                 env_context_batch,
                 mask,
-                diversity_scaling,
+                diversity_scaling if generation_lidar is None else
+                jnp.repeat(jnp.broadcast_to(jnp.asarray(diversity_scaling).reshape(-1),
+                                           (obs_batch.shape[0] // num_agents,)), num_agents),
             )
+            if generation_lidar is not None:
+                # Each deployed agent retains the entire team context from its
+                # own most recent refresh, including its attention partners.
+                selected = jnp.arange(obs_batch.shape[0]) * num_agents + jnp.tile(
+                    jnp.arange(num_agents), obs_batch.shape[0] // num_agents)
+                adapters_dict = {key: matrix[selected] for key, matrix in adapters_dict.items()}
 
             mean, log_std = shared_policy.apply(
                 {"params": policy_params}, obs_batch, adapters_dict
             )
             std = jnp.exp(log_std)
-            std = jnp.maximum(std, 0.3)
+            std = jnp.maximum(std, shared_policy.min_std)
 
             base_dist = distrax.Normal(mean, std)
             dist = distrax.Transformed(base_dist, distrax.Tanh())
@@ -77,14 +87,23 @@ def make_train_step(shared_policy, hypernetwork, critic, adapter_regularization_
             agent_mask_template = agent_indices < current_num_agents
             valid_agent_mask = jnp.tile(agent_mask_template, batch_size_total // num_agents)
 
-            policy_loss_masked = policy_loss_per_agent * valid_agent_mask
-            policy_loss = policy_loss_masked.sum() / jnp.maximum(valid_agent_mask.sum(), 1.0)
+            if valid_steps is not None:
+                valid_agent_mask &= jnp.repeat(valid_steps, num_agents)
 
-            entropy_masked = entropy_per_agent * valid_agent_mask
-            entropy = entropy_masked.sum() / jnp.maximum(valid_agent_mask.sum(), 1.0)
+            def mean_valid(array):
+                rows = array.reshape(batch_size_total, -1)
+                return jnp.mean(rows, where=valid_agent_mask[:, None])
 
-            policy_regularization = 0.001 * jnp.mean(jnp.square(mean))
-            policy_loss = policy_loss + policy_regularization
+            def variance_valid(array):
+                return mean_valid(jnp.square(array - mean_valid(array)))
+
+            mean_stat = jnp.mean if valid_steps is None else mean_valid
+            variance_stat = jnp.var if valid_steps is None else variance_valid
+            stat_mask = None if valid_steps is None else valid_agent_mask[:, None]
+
+            policy_loss = mean_valid(policy_loss_per_agent)
+            entropy = mean_valid(entropy_per_agent)
+            policy_loss += 0.001 * mean_stat(jnp.square(mean))
 
             values = critic.apply({"params": critic_params}, global_state_batch)
             values_flat = values.reshape(-1)
@@ -100,13 +119,12 @@ def make_train_step(shared_policy, hypernetwork, critic, adapter_regularization_
             else:
                 value_loss_per_agent = (values_flat - returns_batch) ** 2
 
-            value_loss_masked = value_loss_per_agent * valid_agent_mask
-            value_loss = value_loss_masked.sum() / jnp.maximum(valid_agent_mask.sum(), 1.0)
+            value_loss = mean_valid(value_loss_per_agent)
 
             adapter_norm = 0.0
             adapter_count = 0
             for v in adapters_dict.values():
-                adapter_norm += jnp.mean(jnp.square(v))
+                adapter_norm += mean_stat(jnp.square(v))
                 adapter_count += 1
             adapter_mean_norm = (
                 jnp.sqrt(adapter_norm / max(adapter_count, 1)) if adapter_count > 0 else 0.0
@@ -124,15 +142,20 @@ def make_train_step(shared_policy, hypernetwork, critic, adapter_regularization_
                 "policy_loss": policy_loss,
                 "value_loss": value_loss,
                 "entropy": entropy,
-                "approx_kl": jnp.mean((new_log_probs - old_log_probs_batch) ** 2),
-                "mean_ratio": jnp.mean(ratio),
-                "advantages_mean": jnp.mean(advantages_batch),
-                "advantages_std": jnp.std(advantages_batch),
-                "advantages_max": jnp.max(jnp.abs(advantages_batch)),
+                "approx_kl": mean_stat((new_log_probs - old_log_probs_batch) ** 2),
+                "mean_ratio": mean_stat(ratio),
+                "clip_fraction": mean_stat(jnp.abs(ratio - 1.0) > clip_epsilon),
+                "value_explained_variance": 1 - variance_stat(returns_batch - values_flat)
+                / jnp.maximum(variance_stat(returns_batch), 1e-8),
+                "advantages_mean": mean_stat(advantages_batch),
+                "advantages_std": jnp.sqrt(variance_stat(advantages_batch)),
+                "advantages_max": jnp.max(jnp.abs(advantages_batch),
+                                          where=None if stat_mask is None else valid_agent_mask,
+                                          initial=0),
                 "adapter_norm": adapter_mean_norm,
-                "mean_std": jnp.mean(std),
-                "min_std": jnp.min(std),
-                "max_std": jnp.max(std),
+                "mean_std": mean_stat(std),
+                "min_std": jnp.min(std, where=stat_mask, initial=jnp.inf),
+                "max_std": jnp.max(std, where=stat_mask, initial=-jnp.inf),
             }
             return total_loss, info_dict
 

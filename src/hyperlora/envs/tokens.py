@@ -19,6 +19,7 @@ class HypernetworkInputs:
     target_nmd: jnp.ndarray | None = None
     env_context: jnp.ndarray | None = None
     mask: jnp.ndarray | None = None
+    generation_lidar: jnp.ndarray | None = None
 
     FIELDS = ("task", "context", "lidar", "food_positions", "agent_positions", "target_nmd",
               "env_context")
@@ -27,11 +28,22 @@ class HypernetworkInputs:
         return (self.task, self.context, self.lidar, self.food_positions, self.agent_positions,
                 self.target_nmd, self.env_context, self.mask)
 
+    def generation_shape(self) -> tuple[int, int]:
+        """Number of team contexts and agent slots sent to one generator call."""
+        shapes = {tuple(getattr(self, name).shape[:2]) for name in self.FIELDS
+                  if getattr(self, name) is not None}
+        if len(shapes) != 1:
+            raise ValueError(f"Generator inputs need one consistent team shape, got {shapes}")
+        return shapes.pop()
+
     def flatten_rows(self, batch_size: int) -> dict:
         rows = {}
         for name in self.FIELDS:
             value = getattr(self, name)
             rows[name] = None if value is None else value.reshape(batch_size, -1)
+        if self.generation_lidar is not None:
+            rows["generation_lidar"] = self.generation_lidar.reshape(
+                batch_size, *self.generation_lidar.shape[2:])
         return rows
 
     def with_rows(self, indices, replacement: "HypernetworkInputs") -> "HypernetworkInputs":
@@ -157,7 +169,10 @@ def navigation_inputs(config: Config, obs_list: list[torch.Tensor], obs_dim: int
     lidar = lidar_to_jax(extract_lidar(obs_list, lidar_dim(obs_dim)))
     mask = (create_attention_mask(current_num_agents, env_num_agents)
             if current_num_agents < env_num_agents else None)
-    return HypernetworkInputs(lidar=lidar, mask=mask)
+    generation_lidar = None
+    if config.research_metrics:
+        generation_lidar = jnp.repeat(lidar[:, None, :, :], env_num_agents, axis=1)
+    return HypernetworkInputs(lidar=lidar, mask=mask, generation_lidar=generation_lidar)
 
 
 PRESSURE_PLATE_ENV_CONTEXT_FLAGS = ("plate_positions", "door_state", "goal_position", "agent_ids")

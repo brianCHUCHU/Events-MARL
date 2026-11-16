@@ -22,6 +22,13 @@ class MinibatchIndices:
 
 def make_indices(total_agent_rows: int, total_env_rows: int, num_agents: int,
                  num_minibatches: int, shuffle: bool, shuffle_rng) -> MinibatchIndices:
+    if num_agents < 1 or total_agent_rows != total_env_rows * num_agents:
+        raise ValueError("Agent rows must contain complete teams for every environment row")
+    if num_minibatches < 1 or total_env_rows < 1 or total_env_rows % num_minibatches:
+        raise ValueError(f"{total_env_rows} team rows cannot be divided into "
+                         f"{num_minibatches} complete minibatches")
+    if shuffle and shuffle_rng is None:
+        raise ValueError("Shuffled minibatches require an explicit RNG key")
     if shuffle and shuffle_rng is not None:
         env_indices = jax.random.permutation(shuffle_rng, jnp.arange(total_env_rows))
         agent_offsets = jnp.arange(num_agents)

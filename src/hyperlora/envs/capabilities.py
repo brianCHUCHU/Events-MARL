@@ -21,7 +21,7 @@ def sample_capabilities(env_config: EnvConfig, current_num_agents: int,
     if env_config.scenario == "reverse_transport":
         return _reverse_transport_capabilities(env_config, current_num_agents, np_rng)
     if env_config.scenario == "pressure_plate":
-        return _navigation_capabilities(env_config, current_num_agents, np_rng)
+        return initial_capabilities(env_config)
     return _navigation_capabilities(env_config, current_num_agents, np_rng)
 
 
@@ -110,6 +110,13 @@ def _navigation_capabilities(env_config: EnvConfig, current_num_agents: int,
 
 def initial_capabilities(env_config: EnvConfig) -> dict[str, list[float]]:
     n = team_size(env_config)
+    if env_config.scenario == "pressure_plate":
+        speeds = list(env_config.fixed_capabilities.get("speed", []))
+        if (not env_config.use_fixed_capabilities or env_config.mixed_agent_training
+                or len(speeds) != n or any(speed != 1.0 for speed in speeds)):
+            raise ValueError("Pressure Plate's scenario implements fixed max_speed=1.0 for every "
+                             "robot; declare those speeds explicitly instead of ignored capabilities")
+        return {"speed": speeds}
     if env_config.scenario == "reverse_transport":
         fixed = env_config.fixed_capabilities
         if env_config.use_fixed_capabilities:
@@ -129,9 +136,10 @@ def initial_capabilities(env_config: EnvConfig) -> dict[str, list[float]]:
     if env_config.use_fixed_capabilities:
         fixed = env_config.fixed_capabilities
         speeds, lidar = list(fixed.get("speed", [])), list(fixed.get("lidar_range", []))
-        if len(speeds) != n or len(lidar) != n:
-            speeds = [[0.5, 1.5][i % 2] for i in range(n)]
-            lidar = [0.5] * n
-        return {"speed": speeds, "lidar_range": lidar}
+        if len(speeds) < n or len(lidar) < n:
+            raise ValueError(f"Fixed capabilities need speed and lidar_range for all {n} agents")
+        if not all(np.isfinite(v) and v > 0 for v in speeds[:n] + lidar[:n]):
+            raise ValueError("Fixed speed and lidar_range values must be positive and finite")
+        return {"speed": speeds[:n], "lidar_range": lidar[:n]}
     return {"speed": [1.0] * n, "lidar_range": [0.5] * n}
 

@@ -9,11 +9,16 @@ from ..algorithms.ps import zero_adapters
 from ..envs.tokens import capability_context, pressure_plate_env_context
 
 
+def deterministic_action(mean):
+    """Use the same squashing transform as the continuous rollout policy."""
+    return jnp.tanh(mean)
+
+
 def ours(models, config, adapter, num_agents, obs_dim, hn_apply, events_factory=None):
     @jax.jit
     def act(policy_params, obs_batch, adapters):
         mean, _log_std = models.policy.apply({"params": policy_params}, obs_batch, adapters)
-        return jnp.clip(mean, -1.0, 1.0)
+        return deterministic_action(mean)
 
     num_envs = config.env.num_envs
 
@@ -82,7 +87,7 @@ def ps(models, config, adapter, num_agents, obs_dim, input_dim, action_dim):
     @jax.jit
     def act(policy_params, obs_batch, adapters):
         mean, _log_std = models.policy.apply({"params": policy_params}, obs_batch, adapters)
-        return jnp.clip(mean, -1.0, 1.0)
+        return deterministic_action(mean)
 
     num_envs = config.env.num_envs
     batch = num_envs * num_agents
@@ -108,7 +113,7 @@ def dico(models, config, num_agents):
     def act(policy_params, obs_batch, agent_ids):
         mean, _log_std = models.policy.apply({"params": policy_params}, obs_batch, agent_ids,
                                              diversity_scaling=1.0)
-        return jnp.clip(mean, -1.0, 1.0)
+        return deterministic_action(mean)
 
     num_envs = config.env.num_envs
     agent_ids = jnp.asarray(np.tile(np.arange(num_agents), num_envs) % models.policy.num_agents)
@@ -136,7 +141,7 @@ def cash(models, config, adapter, num_agents, obs_dim, input_dim):
             {"params": policy_params}, hidden,
             (obs_batch[None, ...], jnp.zeros((1, obs_batch.shape[0]), dtype=bool),
              capabilities[None, ...]))
-        return new_hidden, jnp.clip(mean_seq[0], -1.0, 1.0)
+        return new_hidden, deterministic_action(mean_seq[0])
 
     num_envs = config.env.num_envs
     batch = num_envs * num_agents

@@ -15,6 +15,7 @@ class Requery:
     scaling: float | None = None
     tokens: Any = None
     alpha: float | None = None
+    generated_indices: np.ndarray | None = None
 
 
 class NoEvents:

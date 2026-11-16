@@ -1,0 +1,11 @@
+run,peak_success_percent,peak_goal_completion_percent,final_goal_completion_percent,peak_round,peak_valid_environment_steps,peak_simulator_environment_steps,final_success_percent,peak_to_final_drop_pp,process_minutes,train_eval_minutes_at_peak,peak_mean_queries,peak_checkpoint
+navigation_event_seed42,85.15625,96.0546875,93.59375,150,2751837,3840000,76.5625,8.59375,82.97093333333333,36.29957106598089,1.7716796875,runs/status_update_2026-11-16/batch/navigation_event_seed42/checkpoints/evaluated_round_0150.npz
+navigation_fixed_100_seed42,86.71875,96.5625,93.06640625,200,3710588,5120000,75.078125,11.640625,73.08863333333333,36.65526525071617,1.60703125,runs/status_update_2026-11-16/batch/navigation_fixed_100_seed42/checkpoints/evaluated_round_0200.npz
+navigation_fixed_25_seed42,85.9375,96.2109375,93.02734375,175,3417132,4480000,74.84375,11.09375,74.05643333333335,32.841541188198576,5.040625,runs/status_update_2026-11-16/batch/navigation_fixed_25_seed42/checkpoints/evaluated_round_0175.npz
+navigation_fixed_50_seed42,82.109375,95.17578125,89.453125,50,1181734,1280000,63.28125,18.828125,73.39875,9.453727965268554,2.78359375,runs/status_update_2026-11-16/batch/navigation_fixed_50_seed42/checkpoints/evaluated_round_0050.npz
+navigation_single_seed42,79.765625,94.55078125,92.9296875,250,4529159,6400000,74.140625,5.625,103.28523333333332,66.18091302427578,1.0,runs/status_update_2026-11-16/batch/navigation_single_seed42/checkpoints/evaluated_round_0250.npz
+pressure_plate_event_seed42,99.296875,,,130,3203718,3328000,18.984375,80.3125,30.15335,20.01836251041897,3.1296875,runs/status_update_2026-11-16/batch/pressure_plate_event_seed42/checkpoints/evaluated_round_0130.npz
+pressure_plate_fixed_152_seed42,0.0,,,,,,0.0,0.0,25.714466666666667,,2.0,
+pressure_plate_fixed_38_seed42,0.0,,,,,,0.0,0.0,24.958133333333333,,6.0,
+pressure_plate_fixed_76_seed42,100.0,,,120,2878561,3072000,0.0,100.0,24.375566666666668,14.972743305566427,2.0,runs/status_update_2026-11-16/batch/pressure_plate_fixed_76_seed42/checkpoints/evaluated_round_0120.npz
+pressure_plate_single_seed42,0.0,,,,,,0.0,0.0,24.844483333333336,,1.0,

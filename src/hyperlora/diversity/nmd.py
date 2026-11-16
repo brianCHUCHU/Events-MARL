@@ -8,6 +8,23 @@ import jax.numpy as jnp
 import numpy as np
 
 
+def buffer_entries(tokens, fields, num_envs: int, num_agents: int) -> list:
+    """Retain an agent's token and its actual attention partners for NMD."""
+    entries = []
+    for env_idx in range(num_envs):
+        for agent_idx in range(num_agents):
+            entry = {"task": None, "context": None, "lidar": None, "target_nmd": None,
+                     "query_type": "initial", "hidden_state": None, "agent_idx": agent_idx}
+            for name in fields:
+                value = getattr(tokens, name)
+                entry[name] = None if value is None else value[env_idx, agent_idx]
+            if tokens.lidar is not None:
+                entry["team_lidar"] = tokens.lidar[env_idx]
+                entry["attention_mask"] = None if tokens.mask is None else tokens.mask[0]
+            entries.append(entry)
+    return entries
+
+
 def wasserstein_distance_gaussian(mean1, std1, mean2, std2, just_mean: bool = True):
     mean_dist = jnp.linalg.norm(mean1 - mean2, ord=2, axis=-1)
     if just_mean:
@@ -109,6 +126,20 @@ def calculate_nmd(
         [e["lidar"] for e in entries], axis=0)
 
     hn_max_agents = hypernetwork.max_agents
+    team_lidar, attention_mask = None, None
+    if lidar_batch is not None:
+        if any(e.get("team_lidar") is None for e in entries):
+            raise ValueError("LiDAR NMD requires recorded team_lidar; repeating an agent's "
+                             "local LiDAR changes cross-agent attention")
+        team_lidar = jnp.stack([e["team_lidar"] for e in entries])
+        expected = (num_adapters, hn_max_agents, lidar_batch.shape[-1])
+        if team_lidar.shape != expected:
+            raise ValueError(f"team_lidar has shape {team_lidar.shape}, expected {expected}")
+        masks = [e.get("attention_mask") for e in entries]
+        if any(m is not None for m in masks):
+            if any(m is None for m in masks):
+                raise ValueError("NMD entries must consistently record attention masks")
+            attention_mask = jnp.stack(masks)
     repeat = lambda x: None if x is None else jnp.repeat(x[:, None, :], hn_max_agents, axis=1)
     zeros = lambda dim: (jnp.zeros((num_adapters, hn_max_agents, dim)) if dim > 0 else None)
 
@@ -125,12 +156,12 @@ def calculate_nmd(
         {"params": hn_params},
         repeat(task_batch),
         repeat(context_batch),
-        repeat(lidar_batch),
+        team_lidar,
         zeros(hypernetwork.food_position_dim),
         agent_positions,
         zeros(hypernetwork.target_nmd_dim),
         zeros(hypernetwork.env_context_dim),
-        mask=None,
+        mask=attention_mask,
         diversity_scaling=diversity_scaling,
     )
 

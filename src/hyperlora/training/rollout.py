@@ -17,9 +17,12 @@ class Trajectory:
     rewards: list = field(default_factory=list)
     values: list = field(default_factory=list)
     dones: list = field(default_factory=list)
+    active_envs: list = field(default_factory=list)
     token_rows: list = field(default_factory=list)
+    adapter_scales: list = field(default_factory=list)
     episode_rewards: list = field(default_factory=list)
     requery_events: list = field(default_factory=list)
+    generator_refresh_sizes: list = field(default_factory=list)
     num_resets: int = 0
 
 
@@ -42,11 +45,16 @@ def _apply_requery(requery, adapters, tokens, hn_apply, alpha, buffer, traj, ste
         return adapters, tokens, alpha
     scaling = alpha if requery.scaling is None else requery.scaling
     new_adapters = hn_apply(requery.inputs, scaling)
+    if requery.generated_indices is not None:
+        new_adapters = {key: matrix[requery.generated_indices]
+                        for key, matrix in new_adapters.items()}
     adapters = {k: adapters[k].at[requery.indices].set(new_adapters[k]) for k in adapters}
     if requery.tokens is None:
         tokens = tokens.with_rows(requery.indices, requery.inputs)
     buffer.extend(requery.entries)
     traj.requery_events.append((step, requery.indices.tolist()))
+    contexts, slots = requery.inputs.generation_shape()
+    traj.generator_refresh_sizes.append((contexts, contexts * slots))
     return adapters, tokens, alpha
 
 
@@ -63,19 +71,35 @@ def _global_state(obs_transposed: torch.Tensor, num_envs: int, num_agents: int,
 
 def collect_rollout(*, env, obs, policy_params, critic_params, adapters, hn_apply, tokens, events,
                     config, num_agents, current_num_agents, episode: int, alpha: float,
-                    buffer: list, get_actions, get_value, obs_suffix=None) -> RolloutResult:
+                    buffer: list, get_actions, get_value, obs_suffix=None, trace=None) -> RolloutResult:
     env_config, ppo = config.env, config.ppo
     num_envs = env_config.num_envs
     batch_size = num_envs * num_agents
     mixed = env_config.mixed_agent_training
     traj = Trajectory()
+    # Keep the original vectorized rollout shape. Only Ours' Pressure Plate
+    # trainer consumes an active mask for its GAE and PPO updates.
+    active_envs = (torch.ones(num_envs, dtype=torch.bool, device=obs[0].device)
+                   if config.method == "ours" and (env_config.scenario == "pressure_plate"
+                       or (config.research_metrics and env_config.scenario == "navigation"))
+                   else None)
 
     jax_rng = jax.random.PRNGKey(episode)
+    if config.research_metrics and config.seed:
+        jax_rng = jax.random.fold_in(jax_rng, config.seed)
+    if trace is not None:
+        trace.initial_adapters(adapters)
 
     for step in range(ppo.rollout_steps):
-        adapters, tokens, alpha = _apply_requery(events.before_step(env, obs, tokens, step),
-                                                 adapters, tokens, hn_apply, alpha, buffer, traj,
-                                                 step)
+        if active_envs is None:
+            refresh = events.before_step(env, obs, tokens, step)
+        else:
+            refresh = events.before_step(env, obs, tokens, step, active_envs=active_envs)
+            traj.active_envs.append(active_envs.cpu().numpy().copy())
+        adapters, tokens, alpha = _apply_requery(refresh, adapters, tokens, hn_apply,
+                                                 alpha, buffer, traj, step)
+        if config.research_metrics:
+            traj.adapter_scales.append(alpha)
 
         obs_transposed = torch.stack(obs, dim=0).transpose(0, 1)
         jax_obs = jnp.asarray(obs_transposed.reshape(batch_size, -1).cpu().numpy())
@@ -91,21 +115,36 @@ def collect_rollout(*, env, obs, policy_params, critic_params, adapters, hn_appl
         values = get_value(critic_params, jax_global_state)
 
         jax_rng, action_rng = jax.random.split(jax_rng)
-        action, log_prob, _hidden, _mean, _std = get_actions(
+        action, log_prob, _hidden, mean, std = get_actions(
             policy_params, jax_obs, adapters, action_rng)
 
         actions_flat = np.asarray(action)
+        if config.research_metrics:
+            valid_agents = (np.ones(batch_size, dtype=bool) if active_envs is None else
+                            np.repeat(active_envs.cpu().numpy(), num_agents))
+            for name, data in (("observation", jax_obs), ("action", action),
+                               ("log_prob", log_prob), ("policy_mean", mean),
+                               ("policy_std", std), ("value", values)):
+                if not np.isfinite(np.asarray(data).reshape(batch_size, -1)[valid_agents]).all():
+                    raise FloatingPointError(f"Non-finite rollout {name} at round {episode + 1}, step {step}")
         if np.isnan(actions_flat).any():
             actions_flat = np.nan_to_num(actions_flat, nan=0.0, posinf=0.0, neginf=0.0)
         actions_reshaped = actions_flat.reshape(num_envs, num_agents, -1)
         if mixed:
             agent_mask = np.arange(num_agents) < current_num_agents
             actions_reshaped = actions_reshaped * agent_mask[np.newaxis, :, np.newaxis]
+        if active_envs is not None:
+            actions_reshaped = np.where(active_envs.cpu().numpy()[:, None, None],
+                                        actions_reshaped, 0.0)
 
         torch_actions = [
             torch.tensor(actions_reshaped[:, i, :], dtype=torch.float32) for i in range(num_agents)
         ]
         next_obs, rewards, dones, _info = env.step(torch_actions)
+        if trace is not None:
+            trace.step(env, obs, torch_actions, rewards, dones, tokens, refresh, adapters,
+                       mean, std, active=active_envs, adapter_scale=alpha,
+                       log_probs=log_prob, values=values)
 
         traj.obs.append(jax_obs)
         traj.global_states.append(jax_global_state)
@@ -127,16 +166,28 @@ def collect_rollout(*, env, obs, policy_params, critic_params, adapters, hn_appl
             jnp.nan_to_num(values, nan=0.0, posinf=100.0, neginf=-100.0), -100.0, 100.0))
 
         rewards_np = torch.stack(rewards, dim=0).transpose(0, 1).cpu().numpy()
+        if config.research_metrics:
+            valid_teams = (np.ones(num_envs, dtype=bool) if active_envs is None else
+                           traj.active_envs[-1])
+            if not np.isfinite(rewards_np[valid_teams]).all():
+                raise FloatingPointError(f"Non-finite rollout reward at round {episode + 1}, step {step}")
         rewards_np = np.nan_to_num(rewards_np, nan=0.0, posinf=0.0, neginf=0.0)
         if mixed:
             rewards_np = rewards_np * (np.arange(num_agents) < current_num_agents)[np.newaxis, :]
+        if active_envs is not None:
+            active_rows = traj.active_envs[-1]
+            rewards_np[~active_rows] = 0
+            reward_mean = float(rewards_np.sum() / max(active_rows.sum() * num_agents, 1))
+            dones = dones.bool() & active_envs
+            active_envs = active_envs & ~dones
+        else:
+            reward_mean = float(rewards_np.mean())
         traj.rewards.append(np.asarray(rewards_np).flatten())
-        reward_mean = float(rewards_np.mean())
         traj.episode_rewards.append(0.0 if not np.isfinite(reward_mean) else reward_mean)
 
         traj.dones.append(jnp.array(np.repeat(dones.cpu().numpy(), num_agents), dtype=bool))
 
-        if bool(dones.all().item()):
+        if active_envs is None and not config.research_metrics and bool(dones.all().item()):
             traj.num_resets += 1
             next_obs = env.reset()
 

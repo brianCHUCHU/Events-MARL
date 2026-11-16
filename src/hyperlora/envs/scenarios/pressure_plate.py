@@ -203,9 +203,8 @@ class Scenario(BaseScenario):
         self.agents_at_goal = torch.zeros(
             batch_dim, self.n_ground_robots, dtype=torch.bool, device=device
         )
-        self.prev_agents_at_goal = torch.zeros(
-            batch_dim, self.n_ground_robots, dtype=torch.bool, device=device
-        )
+        self.goal_visitors = torch.zeros_like(self.agents_at_goal)
+        self.goal_reward_this_step = torch.zeros(batch_dim, device=device)
 
         # Distance shaping tracking for global obs
         self.prev_dist_to_plates = torch.zeros(
@@ -360,7 +359,8 @@ class Scenario(BaseScenario):
         if env_index is None:
             self.door_open[:] = False
             self.agents_at_goal[:] = False
-            self.prev_agents_at_goal[:] = False
+            self.goal_visitors[:] = False
+            self.goal_reward_this_step[:] = 0
             self.prev_dist_to_plates[:] = 0
             self.prev_dist_to_goal[:] = 0
             self.occupancy_grid[:] = 0
@@ -378,7 +378,8 @@ class Scenario(BaseScenario):
         else:
             self.door_open[env_index] = False
             self.agents_at_goal[env_index] = False
-            self.prev_agents_at_goal[env_index] = False
+            self.goal_visitors[env_index] = False
+            self.goal_reward_this_step[env_index] = 0
             self.prev_dist_to_plates[env_index] = 0
             self.prev_dist_to_goal[env_index] = 0
             self.occupancy_grid[env_index] = 0
@@ -469,7 +470,11 @@ class Scenario(BaseScenario):
             is_at_goal = dist < (self.goal_radius + robot.shape.radius + 0.05)
             self.agents_at_goal[:, i] = is_at_goal
 
-            # Goal is not a "target" for discovery.
+        # VMAS reads rewards one agent at a time after post_step. Cache the
+        # first-visit bonus so every agent receives the same team component.
+        first_visits = self.agents_at_goal & ~self.goal_visitors
+        self.goal_reward_this_step[:] = first_visits.sum(dim=-1) * self.goal_reward
+        self.goal_visitors |= self.agents_at_goal
 
     def reward(self, agent: Agent):
         if self.reward_type == "sparse":
@@ -485,7 +490,7 @@ class Scenario(BaseScenario):
         # === HYBRID REWARD SHARING ===
         # Global task rewards (shared by all agents) + Individual distance shaping (per-agent)
 
-        global_task_reward = torch.zeros(self.world.batch_dim, device=self.world.device)
+        global_task_reward = self.goal_reward_this_step.clone()
         individual_shaping = torch.zeros(self.world.batch_dim, device=self.world.device)
 
         # Time penalty (shared)
@@ -498,16 +503,6 @@ class Scenario(BaseScenario):
         # === GLOBAL TASK REWARDS (shared by all agents) ===
         ground_robots = [a for a in self.world.agents if "ground_robot" in a.name]
         batch_indices = torch.arange(self.world.batch_dim, device=self.world.device)
-
-        # Goal reward: each agent that newly reaches the goal
-        # Calculate which agents newly arrived at goal this step
-        newly_at_goal = self.agents_at_goal & ~self.prev_agents_at_goal
-        num_newly_at_goal = newly_at_goal.sum(dim=-1).float()  # [B]
-        global_task_reward += num_newly_at_goal * self.goal_reward
-
-        # Update tracking for next step (do this once per step, not per agent)
-        if agent == self.world.agents[0]:
-            self.prev_agents_at_goal = self.agents_at_goal.clone()
 
         # Left plate reward: only when assigned agent is on it
         left_agent_on_plate = torch.zeros(

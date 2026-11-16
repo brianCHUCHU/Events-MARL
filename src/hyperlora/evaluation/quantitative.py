@@ -8,6 +8,8 @@ import numpy as np
 import torch
 
 from ..config import Config
+from ..diversity.control import update_ema
+from ..diversity.nmd import buffer_entries
 from ..envs.tokens import capability_context
 
 
@@ -51,6 +53,10 @@ def _diversity_scaling(config: Config, nmd_ema: float | None) -> float:
 
 def _agent_capabilities(config: Config, fixed: Mapping[str, list] | None, num_agents: int) -> dict:
     scenario = config.env.scenario
+    if scenario == "pressure_plate":
+        from ..envs.capabilities import initial_capabilities
+
+        return initial_capabilities(config.env)
     if fixed is None:
         if scenario == "dispersion":
             return {"max_speed": [1.0 + 0.5 * (i % 2) for i in range(num_agents)]}
@@ -95,16 +101,7 @@ def _agent_capabilities(config: Config, fixed: Mapping[str, list] | None, num_ag
 
 
 def _buffer_entries(tokens, fields: tuple, num_envs: int, num_agents: int) -> list:
-    entries = []
-    for env_idx in range(num_envs):
-        for agent_idx in range(num_agents):
-            entry = {"task": None, "context": None, "lidar": None, "target_nmd": None,
-                     "query_type": "initial", "hidden_state": None, "agent_idx": agent_idx}
-            for name in fields:
-                value = getattr(tokens, name)
-                entry[name] = None if value is None else value[env_idx][agent_idx]
-            entries.append(entry)
-    return entries
+    return buffer_entries(tokens, fields, num_envs, num_agents)
 
 
 def _is_football(env) -> bool:
@@ -117,8 +114,7 @@ def _is_dispersion_like(env) -> bool:
 
 
 def _update_eval_ema(config: Config, nmd_ema: float, measured: float) -> float:
-    coef = config.diversity.nmd_moving_average_coef
-    return coef * nmd_ema + (1.0 - coef) * measured
+    return update_ema(nmd_ema, measured, config.diversity.nmd_moving_average_coef)
 
 
 def run_quantitative_evaluation(*, config: Config, env, models, adapter, num_agents: int,
@@ -223,7 +219,7 @@ def run_quantitative_evaluation(*, config: Config, env, models, adapter, num_age
 
             batch_lengths[active_mask] += 1
             step_rewards = torch.stack(rewards, dim=0).transpose(0, 1).cpu().numpy().mean(axis=1)
-            batch_rewards += step_rewards
+            batch_rewards += step_rewards * active_mask
 
             dones_np = dones.cpu().numpy()
             newly_done = dones_np & active_mask

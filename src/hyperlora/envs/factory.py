@@ -39,6 +39,8 @@ def make_env(env_config: EnvConfig, agent_capabilities: Mapping[str, Any] | None
             raise ValueError(
                 f"navigation takes no scenario_kwargs, got {sorted(env_config.scenario_kwargs)}"
             )
+        if env_config.fixed_food_positions:
+            raise ValueError("Navigation requires randomized food positions")
         return Environment(
             scenario=scenario,
             num_envs=env_config.num_envs,
@@ -50,7 +52,6 @@ def make_env(env_config: EnvConfig, agent_capabilities: Mapping[str, Any] | None
             share_reward=env_config.share_reward,
             distance_shaping_coef=env_config.distance_shaping_coef,
             agent_capabilities=_capabilities(agent_capabilities),
-            fixed_food_positions=env_config.fixed_food_positions,
         )
 
     if spec.paper_name == "dispersion":
@@ -86,6 +87,11 @@ def make_env(env_config: EnvConfig, agent_capabilities: Mapping[str, Any] | None
         )
 
     if spec.paper_name == "pressure_plate":
+        if agent_capabilities is not None and (
+            set(agent_capabilities) != {"speed"}
+            or list(agent_capabilities["speed"]) != [1.0] * n_agents
+        ):
+            raise ValueError("Pressure Plate only implements fixed max_speed=1.0 for every robot")
         kwargs = dict(env_config.scenario_kwargs)
         env = Environment(
             scenario=scenario,

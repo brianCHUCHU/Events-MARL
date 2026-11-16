@@ -66,6 +66,7 @@ class ModelConfig:
     cash_hyper_layers: int | None
     cash_decoder_hidden_dim: int | None
     cash_use_two_layer_decoder: bool | None
+    query_interval: int | None = None
 
 
 @dataclass(frozen=True)
@@ -149,6 +150,7 @@ class EvalConfig:
     eval_max_speeds: tuple
 
     match_training_capabilities: bool
+    seed: int = 20261114
 
 
 @dataclass(frozen=True)
@@ -171,6 +173,7 @@ class Config:
     optimizer: OptimizerConfig
     evaluation: EvalConfig
     logging: LoggingConfig
+    research_metrics: bool = False
 
     def to_dict(self) -> dict:
         data = dataclasses.asdict(self)
@@ -179,6 +182,10 @@ class Config:
         for (section, key), methods in _METHOD_ONLY_FIELDS.items():
             if self.method not in methods:
                 del data[section][key]
+        if not self.research_metrics:
+            del data["research_metrics"]
+        if self.model.query_interval is None:
+            del data["model"]["query_interval"]
         return data
 
 
@@ -190,7 +197,8 @@ _SECTIONS = {
     "evaluation": EvalConfig,
     "logging": LoggingConfig,
 }
-_TOP_LEVEL = {"method", "seed", "jax_threefry_partitionable"}
+_REQUIRED_TOP_LEVEL = {"method", "seed", "jax_threefry_partitionable"}
+_TOP_LEVEL = _REQUIRED_TOP_LEVEL | {"research_metrics"}
 _TUPLE_FIELDS = {"policy_hidden_dims", "speed_range", "lidar_range_range", "eval_max_speeds",
                  "max_speed_range",
                  "force_multiplier_range", "target_nmd_list"}
@@ -198,10 +206,11 @@ _TUPLE_FIELDS = {"policy_hidden_dims", "speed_range", "lidar_range_range", "eval
 
 def _build(section: str, cls, data: Mapping[str, Any], method: str):
     fields = {f.name for f in dataclasses.fields(cls)}
+    required = {f.name for f in dataclasses.fields(cls) if f.default is dataclasses.MISSING}
     absent = {key for (sec, key), methods in _METHOD_ONLY_FIELDS.items()
               if sec == section and method not in methods}
     given = set(data)
-    if missing := sorted(fields - absent - given):
+    if missing := sorted(required - absent - given):
         raise ValueError(f"config section '{section}' is missing required keys: {missing}")
     if unknown := sorted(given - (fields - absent)):
         raise ValueError(f"config section '{section}' has unknown keys for method "
@@ -227,7 +236,7 @@ def load_config(path: str | Path, overrides: Mapping[str, Any] | None = None) ->
     top = {k: v for k, v in raw.items() if k not in _SECTIONS and k != "diversity"}
     if unknown := sorted(set(top) - _TOP_LEVEL):
         raise ValueError(f"config has unknown top-level keys: {unknown}")
-    if missing := sorted(_TOP_LEVEL - set(top)):
+    if missing := sorted(_REQUIRED_TOP_LEVEL - set(top)):
         raise ValueError(f"config is missing required top-level keys: {missing}")
     method = top["method"]
     if method not in METHODS:
@@ -245,14 +254,59 @@ def load_config(path: str | Path, overrides: Mapping[str, Any] | None = None) ->
     if not isinstance(top["jax_threefry_partitionable"], bool):
         raise ValueError("jax_threefry_partitionable must be true or false")
 
-    return Config(
+    research_metrics = top.get("research_metrics", False)
+    if type(research_metrics) is not bool:
+        raise ValueError("research_metrics must be true or false")
+    config = Config(
         method=method,
+        research_metrics=research_metrics,
         seed=int(top["seed"]),
         jax_threefry_partitionable=top["jax_threefry_partitionable"],
         diversity=(None if diversity_cls is None
                    else _build("diversity", diversity_cls, raw["diversity"], method)),
         **{name: _build(name, cls, raw[name], method) for name, cls in _SECTIONS.items()},
     )
+
+    if research_metrics and (method != "ours" or
+                             config.env.scenario not in ("pressure_plate", "wind_flocking", "navigation")):
+        raise ValueError("research_metrics requires Ours on Pressure Plate, Wind Flocking or Navigation")
+    interval = config.model.query_interval
+    if interval is not None and (not research_metrics or config.env.scenario not in ("pressure_plate", "navigation")
+                                 or type(interval) is not int or interval < 1
+                                 or not config.model.adaptive_hypernetwork):
+        raise ValueError("query_interval requires positive integer, research_metrics and "
+                         "an adaptive Pressure Plate or Navigation model")
+    if research_metrics and config.env.scenario == "pressure_plate" and (
+        config.diversity.use_diversity_control or config.diversity.use_adapter_nmd
+    ):
+        raise ValueError("Pressure Plate research schedules require the original no-NMD setting")
+    if research_metrics:
+        if config.env.mixed_agent_training:
+            raise ValueError("Research query comparisons currently require fixed-size teams")
+        if not config.env.continuous_actions:
+            raise ValueError("Research query comparisons currently require continuous actions")
+        if config.env.scenario == "pressure_plate" and config.env.scenario_kwargs.get("with_drone", False):
+            raise ValueError("Pressure Plate research comparisons currently support ground robots only")
+        if (config.diversity.use_adapter_nmd and
+                (type(config.diversity.adapter_nmd_sample_size) is not int
+                 or config.diversity.adapter_nmd_sample_size < 2)):
+            raise ValueError("NMD sampling needs at least two reference adapters")
+        for key, value in (("env.num_envs", config.env.num_envs),
+                           ("ppo.num_episodes", config.ppo.num_episodes),
+                           ("ppo.rollout_steps", config.ppo.rollout_steps),
+                           ("ppo.ppo_epochs", config.ppo.ppo_epochs),
+                           ("evaluation.num_eval_episodes", config.evaluation.num_eval_episodes),
+                           ("evaluation.max_eval_steps", config.evaluation.max_eval_steps)):
+            if type(value) is not int or value < 1:
+                raise ValueError(f"{key} must be a positive integer")
+        count = config.ppo.num_minibatches if config.ppo.use_minibatches else 1
+        if type(count) is not int or count < 1 or config.env.num_envs * config.ppo.rollout_steps % count:
+            raise ValueError("Training team rows must divide evenly into complete minibatches")
+        if type(config.evaluation.seed) is not int or not (
+            0 <= config.evaluation.seed <= 2**32 - config.evaluation.num_eval_episodes
+        ):
+            raise ValueError("evaluation.seed and its batch offsets must fit unsigned 32-bit seeds")
+    return config
 
 
 def dump_config(config: Config, path: str | Path) -> None:

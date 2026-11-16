@@ -238,6 +238,9 @@ class Hypernetwork(nn.Module):
 
         # Extract outputs for all agents and flatten to (num_envs * num_agents, transformer_dim)
         batch_size = num_envs * num_agents
+        if jnp.ndim(diversity_scaling) == 1:
+            # One scale per team/context, shared by all its agents.
+            diversity_scaling = jnp.repeat(diversity_scaling, num_agents)[:, None, None]
         context_output = x.reshape(batch_size, self.transformer_dim)
 
         # Determine which adapters to create based on lora_mode

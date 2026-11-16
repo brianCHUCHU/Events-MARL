@@ -16,9 +16,9 @@ env:
   homogeneous_capabilities: true
   fixed_capabilities:
     speed:
-    - 0.8
     - 1.0
-    - 1.2
+    - 1.0
+    - 1.0
   fixed_food_positions: false
   speed_range:
   - 0.5

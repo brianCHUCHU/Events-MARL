@@ -1,0 +1,130 @@
+% !TEX program = pdflatex
+% Main text: one page. Detailed pilot tables: appendix on the next page.
+% Uses the same ICML 2026 accepted style and author information as the proposal.
+% The bibliography is embedded; no external .bib or figure files are required.
+% Official style source: https://media.icml.cc/Conferences/ICML2026/Styles/icml2026.zip
+\documentclass{article}
+
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+\usepackage[accepted]{icml2026}
+
+% Retain the proposal's suppression of the proceedings/copyright notice.
+\makeatletter
+\renewcommand{\Notice@String}{}
+\makeatother
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage[capitalize,noabbrev]{cleveref}
+
+\icmltitlerunning{Event-Free Behavioral Reconfiguration: Status Update}
+
+\begin{document}
+
+\twocolumn[
+  \icmltitle{Learning Event-Free Behavioral Reconfiguration in Multi-Agent Reinforcement Learning: Status Update}
+
+  \icmlsetsymbol{equal}{*}
+  \begin{icmlauthorlist}
+    \icmlauthor{Po-Yen Chu}{equal,mse}
+    \icmlauthor{Justin Lin}{equal,mse}
+    \icmlauthor{Qirui Zheng}{equal,mscs}
+  \end{icmlauthorlist}
+
+  \icmlaffiliation{mse}{Department of Management Science and Engineering, Stanford University, Stanford, CA, USA}
+  \icmlaffiliation{mscs}{Department of Computer Science, Stanford University, Stanford, CA, USA}
+  \icmlcorrespondingauthor{Po-Yen Chu}{poyenchu@stanford.edu}
+  \icmlcorrespondingauthor{Justin Lin}{justdlin@stanford.edu}
+  \icmlcorrespondingauthor{Qirui Zheng}{qz07@stanford.edu}
+  \icmlkeywords{Multi-Agent Reinforcement Learning, Hypernetworks, Learned Query Timing}
+  \vskip 0.3in
+]
+
+\printAffiliationsAndNotice{}
+
+\section{Pilot Experiments}
+
+Our proposal asks whether agents can learn when to replace their behaviors without handcrafted event rules. We began with a pilot using the public implementation of \citet{buchi2026events}. A query regenerates LoRA adapters over a shared policy; agents continue to choose actions from current observations between queries.
+
+We compared handcrafted events, three fixed $K$-step schedules, and a single query at initialization in three-agent Pressure Plate and four-agent Navigation. Each schedule was trained from scratch, giving ten runs with one training seed per setting. Training budgets were fixed within each environment. The experiments examine how much query scheduling matters before we introduce a learned query policy. Full results and reproducibility details appear in Appendix~\ref{app:results}.
+
+\section{Main Findings}
+
+\textbf{Pressure Plate is highly sensitive to the query schedule.} Handcrafted events reached 99.3\% peak team success and fixed $K=76$ reached 100\%, while $K=38$, $K=152$, and initialization-only queries never completed the task in this seed. Thus, both frequent and infrequent updates can fail. Pressure Plate requires agents to take turns holding plates so teammates can pass through a door, making the timing of behavior changes relevant to coordination. The sharp differences across schedules make it our more informative environment for studying when to query. However, changing $K$ changes both timing and frequency, so this pilot does not yet separate their effects.
+
+\textbf{Successful coordination can deteriorate late in training.} The $K=76$ policy maintained 100\% success from rounds 120 through 180, then fell to 0\% by round 200. Mean return remained high, decreasing only from 307.7 to 305.2. In all 40 sampled final episodes, every agent had visited the goal, but agents left before all three could finish together. Since rewards emphasize first arrivals while success requires simultaneous goal occupancy, this suggests a mismatch worth investigating. The traces identify the failing behavior, but do not yet establish why continued training produces it.
+
+\textbf{Navigation is less sensitive in this pilot.} All schedules reached peak success between 79.8\% and 86.7\%; even initialization-only queries reached 79.8\%. Handcrafted events reached 85.2\%, compared with 86.7\% for fixed $K=100$. Navigation remains a useful secondary check, but Pressure Plate provides a clearer setting in which query decisions appear consequential. Neither environment currently shows a clear advantage for handcrafted timing over a well-chosen periodic schedule. These observations still require confirmation across training seeds.
+
+\section{Implications and Possible Next Steps}
+
+A likely next step is to investigate the late deterioration in Pressure Plate and test ways to preserve successful coordination. Any changes to the task or reward would be evaluated separately from the original setup. We would then explore event-free models that learn query decisions jointly with behavior generation. Periodic and matched-count random schedules would help test whether learned timing improves learning speed, stability, or query cost. The gate architecture and training mechanism remain open; the pilot suggests prioritizing Pressure Plate when making those design choices.
+
+\begin{thebibliography}{1}
+\bibitem[B\"uchi et~al.(2026)]{buchi2026events}
+B\"uchi, H., Flageat, M., Sebasti\'an, E., and Prorok, A.
+\newblock Events as triggers for behavioral diversity in multi-agent reinforcement learning.
+\newblock 2026. \href{https://github.com/proroklab/Events-MARL}{Public implementation}.
+\end{thebibliography}
+
+\label{main:end}
+\clearpage
+\appendix
+\onecolumn
+
+\section{Pilot Results}
+\label{app:results}
+
+All results use training seed 42. \emph{Peak} is the highest success observed across monitored evaluations, not an independent held-out test score. Success requires all three agents to occupy the goal simultaneously in Pressure Plate and all four agents to collect their targets in Navigation. Step counts and query counts refer to the earliest peak.
+
+\begin{table}[ht]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\caption{Pressure Plate. Queries are team refreshes per episode, including initialization; each refresh updates all three agents. A dash indicates no successful team episode at any evaluated point.}
+\label{tab:pp}
+\begin{tabular}{lrrrrrr}
+\toprule
+Schedule & Peak (\%) & Final (\%) & Round & Valid M & Simulator M & Queries \\
+\midrule
+Handcrafted event & 99.30 & 18.98 & 130 & 3.204 & 3.328 & 3.13 \\
+Fixed $K=38$      & 0.00 & 0.00 & -- & -- & -- & -- \\
+Fixed $K=76$      & \textbf{100.00} & 0.00 & 120 & 2.879 & 3.072 & 2.00 \\
+Fixed $K=152$     & 0.00 & 0.00 & -- & -- & -- & -- \\
+Single query      & 0.00 & 0.00 & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\small
+\setlength{\tabcolsep}{5pt}
+\caption{Navigation. Queries are adapter queries per agent per episode, including initialization. The $K=100$ peak has 96.56\% individual target collection and 86.72\% full-team success.}
+\label{tab:nav}
+\begin{tabular}{lrrrrrr}
+\toprule
+Schedule & Peak (\%) & Final (\%) & Round & Valid M & Simulator M & Queries \\
+\midrule
+Handcrafted event & 85.16 & 76.56 & 150 & 2.752 & 3.840 & 1.77 \\
+Fixed $K=25$      & 85.94 & 74.84 & 175 & 3.417 & 4.480 & 5.04 \\
+Fixed $K=50$      & 82.11 & 63.28 & 50  & 1.182 & 1.280 & 2.78 \\
+Fixed $K=100$     & \textbf{86.72} & 75.08 & 200 & 3.711 & 5.120 & 1.61 \\
+Single query      & 79.77 & 74.14 & 250 & 4.529 & 6.400 & 1.00 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent\textit{Step counts.} M denotes one million environment steps. Valid steps exclude transitions after episode completion that are not used for training; simulator steps count all vectorized slots.
+
+\paragraph{Reproducibility.}
+Each schedule was trained from scratch with 128 parallel environments and a 200-step horizon. Pressure Plate used 200 training rounds and Navigation 400. Evaluation occurred every 10 and 25 rounds, respectively, using the same 1,280 seeded episodes with random states isolated from training. Navigation retained Neural Manifold Diversity (NMD) control; Pressure Plate used no diversity control. Source and configuration snapshots are preserved. Cross-seed robustness has not yet been evaluated.
+
+\end{document}

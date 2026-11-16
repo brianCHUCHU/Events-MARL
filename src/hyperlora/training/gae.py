@@ -5,7 +5,7 @@ import numpy as np
 
 def compute_gae(rewards, values, dones, *, gamma: float, gae_lambda: float, reward_scale: float,
                 num_envs: int, num_agents: int, current_num_agents: int,
-                advantage_clip_range: float, mixed_agent_training: bool):
+                advantage_clip_range: float, mixed_agent_training: bool, valid_steps=None):
     rewards = np.asarray(rewards) * reward_scale
     num_steps = len(rewards)
     values = np.asarray(values)
@@ -32,8 +32,12 @@ def compute_gae(rewards, values, dones, *, gamma: float, gae_lambda: float, rewa
         delta = np.clip(delta, -100.0, 100.0)
         gae = delta + gamma * gae_lambda * next_non_terminal * gae
         gae = np.clip(gae, -100.0, 100.0)
+        if valid_steps is not None:
+            gae = np.where(valid_steps[t, :, None], gae, 0.0)
         advantages[t] = gae
         returns[t] = gae + values[t]
+        if valid_steps is not None:
+            returns[t] = np.where(valid_steps[t, :, None], returns[t], 0.0)
 
     if mixed_agent_training:
         agent_mask = np.arange(num_agents) < current_num_agents
@@ -42,21 +46,32 @@ def compute_gae(rewards, values, dones, *, gamma: float, gae_lambda: float, rewa
     advantages_flat = advantages.reshape(-1)
     returns_flat = returns.reshape(-1)
 
+    active = advantages.reshape(num_steps * num_envs, num_agents)
+    if valid_steps is not None:
+        active = active[valid_steps.reshape(-1)]
     if mixed_agent_training:
-        active = advantages_flat.reshape(-1, num_agents)[:, :current_num_agents].flatten()
-        mean, std = active.mean(), active.std()
-    else:
-        mean, std = advantages_flat.mean(), advantages_flat.std()
+        active = active[:, :current_num_agents]
+    mean, std = active.mean(), active.std()
 
     advantages_flat = (advantages_flat - mean) / (std + 1e-8)
     advantages_flat = np.clip(advantages_flat, -advantage_clip_range, advantage_clip_range)
+    if valid_steps is not None:
+        advantages_flat = np.where(np.repeat(valid_steps.reshape(-1), num_agents),
+                                   advantages_flat, 0.0)
     return advantages_flat, returns_flat, values.reshape(-1)
 
 
-def normalize_returns(returns_batch, old_values):
+def normalize_returns(returns_batch, old_values, valid_mask=None):
     import jax.numpy as jnp
 
-    mean, std = returns_batch.mean(), returns_batch.std()
-    return (jnp.asarray((returns_batch - mean) / (std + 1e-8)),
-            (old_values - float(mean)) / (float(std) + 1e-8))
+    returns_batch, old_values = np.asarray(returns_batch), np.asarray(old_values)
+    active = returns_batch if valid_mask is None else returns_batch[np.asarray(valid_mask, dtype=bool)]
+    if active.size == 0:
+        raise ValueError("Return normalization requires at least one valid transition")
+    mean, std = active.mean(), active.std()
+    returns = (returns_batch - mean) / (std + 1e-8)
+    values = (old_values - float(mean)) / (float(std) + 1e-8)
+    if valid_mask is not None:
+        returns, values = np.where(valid_mask, returns, 0.0), np.where(valid_mask, values, 0.0)
+    return jnp.asarray(returns), jnp.asarray(values)
 

@@ -32,7 +32,7 @@ class RunLogger:
     def log(self, record: Mapping[str, Any]) -> None:
         row = {k: _plain(v) for k, v in record.items()}
         with self.jsonl.open("a") as handle:
-            handle.write(json.dumps(row) + "\n")
+            handle.write(json.dumps(row, allow_nan=False) + "\n")
         with self.csv.open("a") as handle:
             handle.write(",".join(str(row.get(f, "")) for f in self.csv_fields) + "\n")
 
