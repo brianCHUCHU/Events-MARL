@@ -129,6 +129,9 @@ Single query      & 79.77 & 74.14 & 250 & 1.00 \\
 \paragraph{Reproducibility.}
 Each condition was trained from scratch with 128 parallel environments and a 200-step horizon: 200 rounds for Pressure Plate and 400 for Navigation. Evaluation occurred every 10 and 25 rounds, respectively, on the same 1,280 seeded episodes with random states isolated from training. Navigation retained Neural Manifold Diversity (NMD) control; Pressure Plate used no diversity control. The gate reads joint observations and time since the last query. Coverage mixes its learned Bernoulli policy with Bernoulli(0.5), using a fixed weight of 0.2 during training and zero during evaluation. Actor/generator rewards match the baseline objective ($\lambda=0$). Source and configuration snapshots are preserved; cross-seed robustness remains untested.
 
-\input{AI_Use_Disclosure}
+\section{AI Use Disclosure}
+\label{app:ai-disclosure}
+
+The research direction and experimental priorities were set by the authors. AI tools were used to assist with code implementation and debugging, experiment setup and execution, analysis and visualization of pilot results, and drafting this status update.
 
 \end{document}

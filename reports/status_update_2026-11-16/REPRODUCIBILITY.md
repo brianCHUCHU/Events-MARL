@@ -22,5 +22,6 @@ updated analysis products in this report directory.
 
 See `docs/query-experiment-metrics.md` and the frozen configs in each local batch
 for full training and metric conventions. See `README.txt` for the self-contained
-LaTeX status-update source, including the separate AI disclosure input file.
+LaTeX status-update source. The AI disclosure is embedded directly in the main
+TeX file; no separate disclosure input is required.
 The source ZIP includes every required TeX and style file.
