@@ -73,6 +73,9 @@ def main() -> None:
                                     ("critic", models.critic_state))
             },
         }
+        if models.gate_state is not None:
+            metrics["parameter_counts"]["gate"] = sum(
+                arr.size for arr in jax.tree.leaves(models.gate_state.params))
         (log_dir / "resources.json").write_text(json.dumps(metrics, indent=2) + "\n")
     print(f"\nwrote {log_dir}/metrics.jsonl")
 

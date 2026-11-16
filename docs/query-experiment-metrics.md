@@ -164,9 +164,10 @@ Pressure Plate reset-only schedule.
   PPO reconstructs the recorded transition's tokens and, in Wind Flocking,
   its active diversity scaling. This changes training semantics relative to
   the upstream refresh path and the earlier seed-0 pilot.
-- The learned gate is future work. These traces can support context-coverage,
-  adapter age, and event-alignment diagnostics. Gate probabilities, entropy,
-  advantages, and exploration-source labels require a gate in the rollout.
+- Opt-in centralized learned-gate and coverage pilots now record gate inputs,
+  probabilities, query age, decision masks, PPO diagnostics and query cost.
+  See `docs/learned-gate-pilot.md`. These are separate new runs; the earlier
+  fixed/event pilot results contain no learned-gate measurements.
 
 ## Regression checks
 

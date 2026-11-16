@@ -14,6 +14,26 @@ spec.loader.exec_module(runner)
 
 
 class ExperimentRunnerTest(unittest.TestCase):
+    def test_gate_selection_runs_only_two_requested_pressure_plate_variants(self):
+        with tempfile.TemporaryDirectory() as temp:
+            project = Path(temp)
+            (project / "src").mkdir()
+            (project / "configs/main/ours").mkdir(parents=True)
+            seen = []
+            def execute(entry, *args):
+                seen.append(entry)
+                return {"scenario":entry[0],"schedule":entry[1],"seed":entry[2]},None
+            argv=["runner","--out",str(project/"batch"),"--scenario","pressure_plate",
+                  "--seeds","42","--schedules","learned_gate","coverage_gate","--workers","2"]
+            with patch.object(runner,"ROOT",project),patch.object(runner,"execute_run",execute), \
+                 patch.object(runner,"write_seed_summary"), \
+                 patch.object(runner.subprocess,"run",return_value=SimpleNamespace(returncode=0)), \
+                 patch("sys.argv",argv):
+                self.assertEqual(runner.main(),0)
+            self.assertEqual({entry[:3] for entry in seen},{("pressure_plate","learned_gate",42),
+                                                          ("pressure_plate","coverage_gate",42)})
+            self.assertTrue(all("evaluation.eval_interval=10" in entry[3] for entry in seen))
+
     def test_peak_records_the_best_evaluation_not_the_final_evaluation(self):
         with tempfile.TemporaryDirectory() as temp:
             path = Path(temp)

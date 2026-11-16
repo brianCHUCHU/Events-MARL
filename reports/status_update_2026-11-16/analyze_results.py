@@ -1,12 +1,11 @@
 from pathlib import Path
 import csv
 import json
+import argparse
 from collections import Counter
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[1]
-BATCH = ROOT / "batch"
 OUT = Path(__file__).resolve().parent
 
 
@@ -106,6 +105,10 @@ def optimize_window(rows):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Reanalyze the retained raw local pilot batch")
+    parser.add_argument("--batch", required=True, type=Path)
+    args = parser.parse_args()
+    BATCH = args.batch.resolve()
     summaries = {r["scenario"] + "_" + r["schedule"] + "_seed" + r["seed"]: r
                  for r in csv.DictReader((BATCH / "summary.csv").open())}
     all_results = {}
@@ -161,7 +164,7 @@ def main():
     with (OUT / "status_results.csv").open("w", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=flat_rows[0])
         writer.writeheader(); writer.writerows(flat_rows)
-    log = ROOT / "batch.log"
+    log = BATCH.parent / "batch.log"
     wall = log.stat().st_mtime - log.stat().st_birthtime
     timing = {"batch_wall_seconds_from_log_lifetime": wall,
               "pressure_plate_sum_process_seconds": sum(float(r["process_wall_seconds"]) for r in summaries.values() if r["scenario"] == "pressure_plate"),

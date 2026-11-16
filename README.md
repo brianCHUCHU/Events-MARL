@@ -4,6 +4,15 @@ Code to train the methods compared in *Events as Triggers for Behavioral Diversi
 Reinforcement Learning* — Ours, parameter sharing (PS), DiCo, CASH and HyperMARL — on the paper's
 environments.
 
+## Research fork progress
+
+The corrected Pressure Plate and Navigation query-schedule pilots, curves and
+one-page status update are in [the November 16 report](reports/status_update_2026-11-16/STATUS_REPORT.md).
+The [bug audit](docs/bug-audit-2026-11-16.md) records protocol repairs and their impact.
+Opt-in centralized learned-gate and coverage pilots for the original VMAS
+Pressure Plate are documented in [the gate protocol](docs/learned-gate-pilot.md).
+These additions are research changes in this fork, not results from the original paper.
+
 ## Install
 
 ```bash

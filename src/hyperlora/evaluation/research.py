@@ -45,6 +45,11 @@ def evaluate(config, adapter, models, hn_apply, policy_outputs, nmd_ema, rounds,
                 env.scenario.update_agent_capabilities(capabilities)
             obs = env.reset(seed=config.evaluation.seed + batch)
             events = adapter.make_events(config, num_envs, num_agents, models.obs_dim, 0, nmd_ema)
+            if config.query_gate.mode != "disabled":
+                from ..training.query_gate import LearnedPressurePlateEvents
+
+                events = LearnedPressurePlateEvents(config, num_envs, num_agents,
+                    models.gate_state, 0, evaluation=True, eval_batch=batch)
             events.prime(obs)
             target = episode_target(config, 0)
             tokens = adapter.build_tokens(config, env, obs, models.obs_dim, num_envs,
@@ -101,6 +106,9 @@ def evaluate(config, adapter, models, hn_apply, policy_outputs, nmd_ema, rounds,
             rollout_wall_seconds += perf_counter() - simulation_started
             episode_data.append(trace.episode_arrays())
             trace.save(trace_root / f"round_{rounds:04d}" / f"batch_{batch:02d}.npz")
+            if config.query_gate.mode != "disabled":
+                events.save(trace_root.parent / "gate_evaluation_traces" /
+                            f"round_{rounds:04d}" / f"batch_{batch:02d}.npz")
 
     results = {key: np.concatenate([batch[key] for batch in episode_data], axis=-1)
                for key in ("team_return", "length", "completed", "team_queries")}
@@ -146,6 +154,10 @@ def evaluate(config, adapter, models, hn_apply, policy_outputs, nmd_ema, rounds,
             agent_queries=int(per_agent.sum()),
             goal_completion_percent=float((collected >= 0).mean() * 100),
         )
+    if config.query_gate.mode != "disabled":
+        metrics.update(query_gate_mode=config.query_gate.mode,
+                       evaluation_gate_policy="seeded_bernoulli_learned_policy",
+                       evaluation_coverage_epsilon=0.0)
     for key in episode_data[0]:
         if key.startswith("first_"):
             steps = np.concatenate([batch[key] for batch in episode_data])

@@ -22,10 +22,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class RealRolloutReplayTest(unittest.TestCase):
-    def check_replay(self, scenario):
+    def check_replay(self, scenario, gate_mode=None):
         config = load_config(ROOT / f"configs/main/ours/{scenario}.yaml", {
             "research_metrics": True, "env.num_envs": 2, "ppo.rollout_steps": 6,
             "ppo.use_minibatches": False,
+            **({"query_gate.mode": gate_mode, "query_gate.generation_bucket": 2}
+               if gate_mode else {}),
         })
         seed_globals(7)
         env = make_env(config.env, initial_capabilities(config.env))
@@ -62,6 +64,15 @@ class RealRolloutReplayTest(unittest.TestCase):
         adapter = get_adapter(scenario)
         tokens = adapter.build_tokens(config, env, obs, models.obs_dim, 2, agents, agents, 0.007)
         events = adapter.make_events(config, 2, agents, models.obs_dim, 0, 0.007)
+        if gate_mode:
+            import jax
+            from hyperlora.training.query_gate import QueryGate, LearnedPressurePlateEvents
+            from hyperlora.training.trainer import _train_state
+
+            gate = QueryGate(16)
+            params = gate.init(jax.random.PRNGKey(12), jnp.ones((1, models.obs_dim*agents+1)))["params"]
+            state = _train_state(gate, params, .0003, .5, config.optimizer)
+            events = LearnedPressurePlateEvents(config, 2, agents, state, 0)
         events.prime(obs)
         alpha = 1.7 if scenario == "navigation" else 1.
         result = collect_rollout(
@@ -90,9 +101,28 @@ class RealRolloutReplayTest(unittest.TestCase):
                                    distrax.Tanh())
         replay_logs = dist.log_prob(jnp.concatenate(trajectory.actions)).sum(axis=-1)
         np.testing.assert_allclose(replay_logs, jnp.concatenate(trajectory.log_probs), atol=2e-6, rtol=2e-6)
+        if gate_mode:
+            from hyperlora.training.query_gate import gate_distribution, bernoulli_log_prob
+            data = events.arrays()
+            logits, _ = gate.apply({"params": params}, jnp.asarray(data["inputs"]))
+            _, p = gate_distribution(logits, events.epsilon)
+            logp = bernoulli_log_prob(p, data["query"])
+            np.testing.assert_allclose(np.asarray(logp)[data["valid"]],
+                                       data["log_prob"][data["valid"]], atol=1e-6)
+            self.assertFalse(data["query"][0].any())
+            self.assertFalse(data["valid"][0].any())
+            # Padded physical generator contexts exceed the number deployed.
+            self.assertGreater(sum(c*agents for c,_ in trajectory.generator_refresh_sizes),
+                               sum(len(ids) for _,ids in trajectory.requery_events))
 
     def test_navigation_asynchronous_refresh_replays_all_actions(self):
         self.check_replay("navigation")
 
     def test_pressure_plate_refresh_replays_all_actions(self):
         self.check_replay("pressure_plate")
+
+    def test_learned_gate_refresh_replays_all_actions_and_queries(self):
+        self.check_replay("pressure_plate", "learned")
+
+    def test_coverage_gate_refresh_replays_all_actions_and_queries(self):
+        self.check_replay("pressure_plate", "coverage")

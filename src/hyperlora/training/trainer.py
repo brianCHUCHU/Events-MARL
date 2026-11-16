@@ -92,6 +92,7 @@ class Models:
     rng: Any
     obs_dim: int
     action_dim: int
+    gate_state: Any = None
 
 
 def _train_state(model, params, learning_rate: float, max_grad_norm: float, optimizer):
@@ -351,6 +352,15 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
     action_dim = _action_dim(config, env)
 
     models = build_models(config, obs_dim, action_dim, num_agents)
+    gate_enabled = config.query_gate.mode != "disabled"
+    if gate_enabled:
+        from .query_gate import QueryGate, LearnedPressurePlateEvents, update_gate
+
+        gate = QueryGate(config.query_gate.hidden_dim)
+        gate_params = gate.init(jax.random.fold_in(jax.random.PRNGKey(config.seed), 9000),
+                                jnp.ones((1, obs_dim*num_agents+1)))["params"]
+        models.gate_state = _train_state(gate, gate_params, config.query_gate.learning_rate,
+                                         config.ppo.max_grad_norm, config.optimizer)
     train_step = make_train_step(models.policy, models.hypernetwork, models.critic,
                                  config.ppo.adapter_regularization_coef)
     get_static_adapters, get_actions, get_value = make_jitted(
@@ -376,7 +386,8 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
         logger.log({"episode": rounds - 1, "eval": True, **metrics})
         save_checkpoint(checkpoint_dir / f"evaluated_round_{rounds:04d}.npz",
                         policy_params=models.policy_state.params, critic_params=models.critic_state.params,
-                        hn_params=models.hn_state.params, episode=rounds, nmd_ema=nmd_ema)
+                        hn_params=models.hn_state.params, episode=rounds, nmd_ema=nmd_ema,
+                        gate_params=None if not gate_enabled else models.gate_state.params)
 
     if config.research_metrics:
         @jax.jit
@@ -437,6 +448,9 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
 
         events = adapter.make_events(config, config.env.num_envs, num_agents, obs_dim,
                                      episode, nmd_ema)
+        if gate_enabled:
+            events = LearnedPressurePlateEvents(config, config.env.num_envs, num_agents,
+                                                 models.gate_state, episode)
         events.prime(obs)
 
         num_envs = config.env.num_envs
@@ -468,8 +482,24 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
             ppo_steps = int(flat_steps.sum())
         environment_steps += ppo_steps
 
+        learning_rewards = traj.rewards
+        gate_metrics = {}
+        if gate_enabled:
+            gate_data = events.arrays()
+            cost = config.query_gate.query_cost * gate_data["query"][..., None]
+            # Preserve baseline clipping scale; charge refresh cost after raw
+            # reward clipping so a large arrival bonus cannot erase its cost.
+            learning_rewards = (np.clip(np.asarray(traj.rewards).reshape(
+                config.ppo.rollout_steps, num_envs, num_agents), -10, 10) - cost)
+            gate_update_started = time.perf_counter()
+            models.gate_state, gate_metrics = update_gate(
+                config, models.gate_state, events, learning_rewards.mean(-1), traj.dones, episode)
+            gate_metrics.update(gate_ppo_wall_seconds=time.perf_counter()-gate_update_started,
+                                gate_total_query_cost=float(cost.sum()),
+                                gate_valid_decisions=int(gate_data["valid"].sum()))
+
         advantages, returns, old_values = compute_gae(
-            traj.rewards, [np.asarray(v) for v in traj.values], np.asarray(traj.dones),
+            learning_rewards, [np.asarray(v) for v in traj.values], np.asarray(traj.dones),
             gamma=config.ppo.gamma, gae_lambda=config.ppo.gae_lambda,
             reward_scale=config.ppo.reward_scale, num_envs=config.env.num_envs,
             num_agents=num_agents, current_num_agents=current_num_agents,
@@ -610,6 +640,7 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
         logger.log({
             "episode": episode,
             **instrumentation,
+            **gate_metrics,
             "avg_reward": (float(np.asarray(traj.rewards).sum() / (ppo_steps * num_agents))
                            if flat_steps is not None else float(np.mean(traj.episode_rewards))),
             "nmd": nmd,
@@ -628,6 +659,8 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
 
         if trace is not None:
             trace.save(log_dir / "training_traces" / f"round_{rounds:04d}.npz")
+            if gate_enabled:
+                events.save(log_dir / "gate_training_traces" / f"round_{rounds:04d}.npz")
         if config.research_metrics:
             if scheduled_eval or final_round:
                 research_evaluate(rounds, environment_steps)
@@ -641,12 +674,14 @@ def train_ours(config: Config, log_dir: Path | None = None, checkpoint_dir: Path
             save_checkpoint(checkpoint_dir / f"checkpoint_{episode}.npz",
                             policy_params=models.policy_state.params,
                             critic_params=models.critic_state.params, episode=episode,
-                            hn_params=models.hn_state.params, nmd_ema=nmd_ema)
+                            hn_params=models.hn_state.params, nmd_ema=nmd_ema,
+                            gate_params=None if not gate_enabled else models.gate_state.params)
 
     save_checkpoint(checkpoint_dir / "final_checkpoint.npz",
                     policy_params=models.policy_state.params,
                     critic_params=models.critic_state.params, episode=config.ppo.num_episodes,
                     hn_params=models.hn_state.params,
+                    gate_params=None if not gate_enabled else models.gate_state.params,
                     nmd_ema=nmd_ema if diversity.use_diversity_control else None)
     return models
 

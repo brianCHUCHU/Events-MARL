@@ -1,0 +1,3154 @@
+{
+  "navigation_event_seed42": {
+    "peak_round": 150,
+    "final_round": 400,
+    "peak_success": 85.15625,
+    "final_success": 76.5625,
+    "peak_to_final_drop_pp": 8.59375,
+    "largest_adjacent_drop_pp": 6.09375,
+    "post_peak_successes": [
+      [
+        175,
+        79.0625
+      ],
+      [
+        200,
+        74.21875
+      ],
+      [
+        225,
+        71.09375
+      ],
+      [
+        250,
+        69.921875
+      ],
+      [
+        275,
+        67.5
+      ],
+      [
+        300,
+        66.40625
+      ],
+      [
+        325,
+        77.34375
+      ],
+      [
+        350,
+        76.015625
+      ],
+      [
+        375,
+        78.046875
+      ],
+      [
+        400,
+        76.5625
+      ]
+    ],
+    "peak": {
+      "episodes": 1280,
+      "success_percent": 85.15625,
+      "mean_team_return": 0.960546875,
+      "mean_length": 112.08125,
+      "mean_team_queries": 4.06328125,
+      "milestone_percent": {},
+      "goal_completion_percent": 96.0546875,
+      "goals_per_episode_histogram": {
+        "4": 1090,
+        "3": 178,
+        "2": 12
+      },
+      "per_agent_collected_percent": [
+        95.78125,
+        96.40625,
+        95.546875,
+        96.484375
+      ],
+      "per_agent_detected_percent": [
+        95.9375,
+        96.796875,
+        95.9375,
+        96.640625
+      ],
+      "detected_but_not_collected_percent": [
+        0.15625,
+        0.390625,
+        0.390625,
+        0.15625
+      ],
+      "mean_agent_queries": 1.7716796875
+    },
+    "final": {
+      "episodes": 1280,
+      "success_percent": 76.5625,
+      "mean_team_return": 0.9359375,
+      "mean_length": 116.559375,
+      "mean_team_queries": 3.9765625,
+      "milestone_percent": {},
+      "goal_completion_percent": 93.59375,
+      "goals_per_episode_histogram": {
+        "4": 980,
+        "3": 272,
+        "2": 28
+      },
+      "per_agent_collected_percent": [
+        93.59375,
+        94.296875,
+        92.890625,
+        93.59375
+      ],
+      "per_agent_detected_percent": [
+        94.296875,
+        94.765625,
+        93.203125,
+        94.21875
+      ],
+      "detected_but_not_collected_percent": [
+        0.703125,
+        0.46875,
+        0.3125,
+        0.625
+      ],
+      "mean_agent_queries": 1.749609375
+    },
+    "paired": {
+      "success_to_failure": 156,
+      "failure_to_success": 46,
+      "both_success": 934,
+      "both_failure": 144
+    },
+    "optimizer_near_peak": {
+      "policy_loss": 0.003286106698215008,
+      "value_loss": 0.001018796779680997,
+      "value_explained_variance": 0.7051896750926971,
+      "entropy": 2.8309949398040772,
+      "mean_std": 0.9973846733570099,
+      "mean_ratio": 1.0000882387161254,
+      "clip_fraction": 0.030766921676695348,
+      "approx_kl": 0.006760082626715303,
+      "policy_grad_norm": 0.20169310122728348,
+      "hn_grad_norm": 0.014406588487327098,
+      "critic_grad_norm": 0.008466758206486702,
+      "nmd": 0.002042600663844496,
+      "nmd_ema": 0.0019282856507936669,
+      "alpha": 1.9076449990272522
+    },
+    "optimizer_last_10": {
+      "policy_loss": 0.00379273381549865,
+      "value_loss": 0.0010428080684505403,
+      "value_explained_variance": 0.6932828307151795,
+      "entropy": 2.836923861503601,
+      "mean_std": 0.9996457755565643,
+      "mean_ratio": 1.0000194132328033,
+      "clip_fraction": 0.031913209706544876,
+      "approx_kl": 0.006879413360729813,
+      "policy_grad_norm": 0.21313734203577042,
+      "hn_grad_norm": 0.001487386750523001,
+      "critic_grad_norm": 0.004370426759123802,
+      "nmd": 0.14874556791037322,
+      "nmd_ema": 0.21015118808409108,
+      "alpha": 0.18567692637443542
+    },
+    "max_pre_update_log_prob_mse": 5.88015608291503e-15,
+    "curve": [
+      {
+        "training_round": 0,
+        "training_environment_steps": 0,
+        "simulator_training_environment_steps": 0,
+        "completion_rate": 0.0,
+        "goal_completion_percent": 9.21875,
+        "avg_reward": 0.0921875
+      },
+      {
+        "training_round": 25,
+        "training_environment_steps": 624758,
+        "simulator_training_environment_steps": 640000,
+        "completion_rate": 73.828125,
+        "goal_completion_percent": 92.3828125,
+        "avg_reward": 0.923828125
+      },
+      {
+        "training_round": 50,
+        "training_environment_steps": 1133464,
+        "simulator_training_environment_steps": 1280000,
+        "completion_rate": 81.953125,
+        "goal_completion_percent": 95.01953125,
+        "avg_reward": 0.9501953125
+      },
+      {
+        "training_round": 75,
+        "training_environment_steps": 1575824,
+        "simulator_training_environment_steps": 1920000,
+        "completion_rate": 82.890625,
+        "goal_completion_percent": 95.3125,
+        "avg_reward": 0.953125
+      },
+      {
+        "training_round": 100,
+        "training_environment_steps": 1976941,
+        "simulator_training_environment_steps": 2560000,
+        "completion_rate": 81.953125,
+        "goal_completion_percent": 95.1953125,
+        "avg_reward": 0.951953125
+      },
+      {
+        "training_round": 125,
+        "training_environment_steps": 2371767,
+        "simulator_training_environment_steps": 3200000,
+        "completion_rate": 81.953125,
+        "goal_completion_percent": 95.17578125,
+        "avg_reward": 0.9517578125
+      },
+      {
+        "training_round": 150,
+        "training_environment_steps": 2751837,
+        "simulator_training_environment_steps": 3840000,
+        "completion_rate": 85.15625,
+        "goal_completion_percent": 96.0546875,
+        "avg_reward": 0.960546875
+      },
+      {
+        "training_round": 175,
+        "training_environment_steps": 3134951,
+        "simulator_training_environment_steps": 4480000,
+        "completion_rate": 79.0625,
+        "goal_completion_percent": 94.31640625,
+        "avg_reward": 0.9431640625
+      },
+      {
+        "training_round": 200,
+        "training_environment_steps": 3523285,
+        "simulator_training_environment_steps": 5120000,
+        "completion_rate": 74.21875,
+        "goal_completion_percent": 92.94921875,
+        "avg_reward": 0.9294921875
+      },
+      {
+        "training_round": 225,
+        "training_environment_steps": 3911719,
+        "simulator_training_environment_steps": 5760000,
+        "completion_rate": 71.09375,
+        "goal_completion_percent": 91.89453125,
+        "avg_reward": 0.9189453125
+      },
+      {
+        "training_round": 250,
+        "training_environment_steps": 4295948,
+        "simulator_training_environment_steps": 6400000,
+        "completion_rate": 69.921875,
+        "goal_completion_percent": 91.46484375,
+        "avg_reward": 0.9146484375
+      },
+      {
+        "training_round": 275,
+        "training_environment_steps": 4684317,
+        "simulator_training_environment_steps": 7040000,
+        "completion_rate": 67.5,
+        "goal_completion_percent": 90.8984375,
+        "avg_reward": 0.908984375
+      },
+      {
+        "training_round": 300,
+        "training_environment_steps": 5076754,
+        "simulator_training_environment_steps": 7680000,
+        "completion_rate": 66.40625,
+        "goal_completion_percent": 90.44921875,
+        "avg_reward": 0.9044921875
+      },
+      {
+        "training_round": 325,
+        "training_environment_steps": 5466292,
+        "simulator_training_environment_steps": 8320000,
+        "completion_rate": 77.34375,
+        "goal_completion_percent": 93.76953125,
+        "avg_reward": 0.9376953125
+      },
+      {
+        "training_round": 350,
+        "training_environment_steps": 5846140,
+        "simulator_training_environment_steps": 8960000,
+        "completion_rate": 76.015625,
+        "goal_completion_percent": 93.4375,
+        "avg_reward": 0.934375
+      },
+      {
+        "training_round": 375,
+        "training_environment_steps": 6230628,
+        "simulator_training_environment_steps": 9600000,
+        "completion_rate": 78.046875,
+        "goal_completion_percent": 93.96484375,
+        "avg_reward": 0.9396484375
+      },
+      {
+        "training_round": 400,
+        "training_environment_steps": 6601066,
+        "simulator_training_environment_steps": 10240000,
+        "completion_rate": 76.5625,
+        "goal_completion_percent": 93.59375,
+        "avg_reward": 0.9359375
+      }
+    ]
+  },
+  "navigation_fixed_100_seed42": {
+    "peak_round": 200,
+    "final_round": 400,
+    "peak_success": 86.71875,
+    "final_success": 75.078125,
+    "peak_to_final_drop_pp": 11.640625,
+    "largest_adjacent_drop_pp": 9.765625,
+    "post_peak_successes": [
+      [
+        225,
+        84.6875
+      ],
+      [
+        250,
+        84.453125
+      ],
+      [
+        275,
+        74.6875
+      ],
+      [
+        300,
+        70.15625
+      ],
+      [
+        325,
+        70.546875
+      ],
+      [
+        350,
+        70.3125
+      ],
+      [
+        375,
+        75.234375
+      ],
+      [
+        400,
+        75.078125
+      ]
+    ],
+    "peak": {
+      "episodes": 1280,
+      "success_percent": 86.71875,
+      "mean_team_return": 0.965625,
+      "mean_length": 114.728125,
+      "mean_team_queries": 1.60703125,
+      "milestone_percent": {},
+      "goal_completion_percent": 96.5625,
+      "goals_per_episode_histogram": {
+        "4": 1110,
+        "3": 165,
+        "2": 4,
+        "1": 1
+      },
+      "per_agent_collected_percent": [
+        96.25,
+        96.484375,
+        96.640625,
+        96.875
+      ],
+      "per_agent_detected_percent": [
+        96.640625,
+        96.796875,
+        97.03125,
+        97.1875
+      ],
+      "detected_but_not_collected_percent": [
+        0.390625,
+        0.3125,
+        0.390625,
+        0.3125
+      ],
+      "mean_agent_queries": 1.60703125
+    },
+    "final": {
+      "episodes": 1280,
+      "success_percent": 75.078125,
+      "mean_team_return": 0.9306640625,
+      "mean_length": 117.8453125,
+      "mean_team_queries": 1.51015625,
+      "milestone_percent": {},
+      "goal_completion_percent": 93.06640625,
+      "goals_per_episode_histogram": {
+        "4": 961,
+        "2": 34,
+        "3": 284,
+        "1": 1
+      },
+      "per_agent_collected_percent": [
+        92.34375,
+        94.6875,
+        91.796875,
+        93.4375
+      ],
+      "per_agent_detected_percent": [
+        93.125,
+        94.84375,
+        92.109375,
+        93.984375
+      ],
+      "detected_but_not_collected_percent": [
+        0.78125,
+        0.15625,
+        0.3125,
+        0.546875
+      ],
+      "mean_agent_queries": 1.51015625
+    },
+    "paired": {
+      "success_to_failure": 227,
+      "failure_to_success": 78,
+      "both_success": 883,
+      "both_failure": 92
+    },
+    "optimizer_near_peak": {
+      "policy_loss": 0.0032877561170607805,
+      "value_loss": 0.0010515445144847035,
+      "value_explained_variance": 0.6851885914802551,
+      "entropy": 2.8304927825927733,
+      "mean_std": 0.997366851568222,
+      "mean_ratio": 0.9998810529708863,
+      "clip_fraction": 0.029793733544647694,
+      "approx_kl": 0.0067084712442010645,
+      "policy_grad_norm": 0.1882810726761818,
+      "hn_grad_norm": 0.00509397559799254,
+      "critic_grad_norm": 0.007340873964130879,
+      "nmd": 0.031380107440054414,
+      "nmd_ema": 0.027692170751455282,
+      "alpha": 0.5034384399652481
+    },
+    "optimizer_last_10": {
+      "policy_loss": 0.00488951955921948,
+      "value_loss": 0.001061122422106564,
+      "value_explained_variance": 0.693450266122818,
+      "entropy": 2.836935019493103,
+      "mean_std": 0.9996292591094971,
+      "mean_ratio": 0.9999376595020294,
+      "clip_fraction": 0.03545430786907673,
+      "approx_kl": 0.007368536852300167,
+      "policy_grad_norm": 0.22356081306934356,
+      "hn_grad_norm": 0.0017145699704997242,
+      "critic_grad_norm": 0.004214456910267473,
+      "nmd": 5.8282939195632935,
+      "nmd_ema": 5.590199915427442,
+      "alpha": 0.03539902120828629
+    },
+    "max_pre_update_log_prob_mse": 0.0,
+    "curve": [
+      {
+        "training_round": 0,
+        "training_environment_steps": 0,
+        "simulator_training_environment_steps": 0,
+        "completion_rate": 0.0,
+        "goal_completion_percent": 9.21875,
+        "avg_reward": 0.0921875
+      },
+      {
+        "training_round": 25,
+        "training_environment_steps": 631956,
+        "simulator_training_environment_steps": 640000,
+        "completion_rate": 3.2031249999999996,
+        "goal_completion_percent": 42.1484375,
+        "avg_reward": 0.421484375
+      },
+      {
+        "training_round": 50,
+        "training_environment_steps": 1211746,
+        "simulator_training_environment_steps": 1280000,
+        "completion_rate": 74.0625,
+        "goal_completion_percent": 92.1484375,
+        "avg_reward": 0.921484375
+      },
+      {
+        "training_round": 75,
+        "training_environment_steps": 1684002,
+        "simulator_training_environment_steps": 1920000,
+        "completion_rate": 80.078125,
+        "goal_completion_percent": 94.31640625,
+        "avg_reward": 0.9431640625
+      },
+      {
+        "training_round": 100,
+        "training_environment_steps": 2115184,
+        "simulator_training_environment_steps": 2560000,
+        "completion_rate": 75.078125,
+        "goal_completion_percent": 93.0078125,
+        "avg_reward": 0.930078125
+      },
+      {
+        "training_round": 125,
+        "training_environment_steps": 2529645,
+        "simulator_training_environment_steps": 3200000,
+        "completion_rate": 78.046875,
+        "goal_completion_percent": 94.04296875,
+        "avg_reward": 0.9404296875
+      },
+      {
+        "training_round": 150,
+        "training_environment_steps": 2933240,
+        "simulator_training_environment_steps": 3840000,
+        "completion_rate": 76.5625,
+        "goal_completion_percent": 93.4375,
+        "avg_reward": 0.934375
+      },
+      {
+        "training_round": 175,
+        "training_environment_steps": 3326833,
+        "simulator_training_environment_steps": 4480000,
+        "completion_rate": 85.859375,
+        "goal_completion_percent": 96.171875,
+        "avg_reward": 0.96171875
+      },
+      {
+        "training_round": 200,
+        "training_environment_steps": 3710588,
+        "simulator_training_environment_steps": 5120000,
+        "completion_rate": 86.71875,
+        "goal_completion_percent": 96.5625,
+        "avg_reward": 0.965625
+      },
+      {
+        "training_round": 225,
+        "training_environment_steps": 4086466,
+        "simulator_training_environment_steps": 5760000,
+        "completion_rate": 84.6875,
+        "goal_completion_percent": 95.91796875,
+        "avg_reward": 0.9591796875
+      },
+      {
+        "training_round": 250,
+        "training_environment_steps": 4450892,
+        "simulator_training_environment_steps": 6400000,
+        "completion_rate": 84.453125,
+        "goal_completion_percent": 95.859375,
+        "avg_reward": 0.95859375
+      },
+      {
+        "training_round": 275,
+        "training_environment_steps": 4822190,
+        "simulator_training_environment_steps": 7040000,
+        "completion_rate": 74.6875,
+        "goal_completion_percent": 92.96875,
+        "avg_reward": 0.9296875
+      },
+      {
+        "training_round": 300,
+        "training_environment_steps": 5203279,
+        "simulator_training_environment_steps": 7680000,
+        "completion_rate": 70.15625,
+        "goal_completion_percent": 91.640625,
+        "avg_reward": 0.91640625
+      },
+      {
+        "training_round": 325,
+        "training_environment_steps": 5590722,
+        "simulator_training_environment_steps": 8320000,
+        "completion_rate": 70.546875,
+        "goal_completion_percent": 91.73828125,
+        "avg_reward": 0.9173828125
+      },
+      {
+        "training_round": 350,
+        "training_environment_steps": 5968816,
+        "simulator_training_environment_steps": 8960000,
+        "completion_rate": 70.3125,
+        "goal_completion_percent": 91.71875,
+        "avg_reward": 0.9171875
+      },
+      {
+        "training_round": 375,
+        "training_environment_steps": 6349837,
+        "simulator_training_environment_steps": 9600000,
+        "completion_rate": 75.234375,
+        "goal_completion_percent": 93.125,
+        "avg_reward": 0.93125
+      },
+      {
+        "training_round": 400,
+        "training_environment_steps": 6717815,
+        "simulator_training_environment_steps": 10240000,
+        "completion_rate": 75.078125,
+        "goal_completion_percent": 93.06640625,
+        "avg_reward": 0.9306640625
+      }
+    ]
+  },
+  "navigation_fixed_25_seed42": {
+    "peak_round": 175,
+    "final_round": 400,
+    "peak_success": 85.9375,
+    "final_success": 74.84375,
+    "peak_to_final_drop_pp": 11.09375,
+    "largest_adjacent_drop_pp": 6.328125,
+    "post_peak_successes": [
+      [
+        200,
+        84.53125
+      ],
+      [
+        225,
+        84.6875
+      ],
+      [
+        250,
+        80.3125
+      ],
+      [
+        275,
+        77.1875
+      ],
+      [
+        300,
+        70.859375
+      ],
+      [
+        325,
+        74.609375
+      ],
+      [
+        350,
+        74.453125
+      ],
+      [
+        375,
+        71.796875
+      ],
+      [
+        400,
+        74.84375
+      ]
+    ],
+    "peak": {
+      "episodes": 1280,
+      "success_percent": 85.9375,
+      "mean_team_return": 0.962109375,
+      "mean_length": 115.8828125,
+      "mean_team_queries": 5.040625,
+      "milestone_percent": {},
+      "goal_completion_percent": 96.2109375,
+      "goals_per_episode_histogram": {
+        "4": 1100,
+        "3": 167,
+        "2": 12,
+        "1": 1
+      },
+      "per_agent_collected_percent": [
+        96.25,
+        96.328125,
+        96.25,
+        96.015625
+      ],
+      "per_agent_detected_percent": [
+        96.875,
+        96.640625,
+        96.71875,
+        96.25
+      ],
+      "detected_but_not_collected_percent": [
+        0.625,
+        0.3125,
+        0.46875,
+        0.234375
+      ],
+      "mean_agent_queries": 5.040625
+    },
+    "final": {
+      "episodes": 1280,
+      "success_percent": 74.84375,
+      "mean_team_return": 0.9302734375,
+      "mean_length": 117.92734375,
+      "mean_team_queries": 5.0671875,
+      "milestone_percent": {},
+      "goal_completion_percent": 93.02734375,
+      "goals_per_episode_histogram": {
+        "3": 287,
+        "4": 958,
+        "2": 35
+      },
+      "per_agent_collected_percent": [
+        93.4375,
+        93.828125,
+        91.5625,
+        93.28125
+      ],
+      "per_agent_detected_percent": [
+        93.90625,
+        94.21875,
+        91.875,
+        93.59375
+      ],
+      "detected_but_not_collected_percent": [
+        0.46875,
+        0.390625,
+        0.3125,
+        0.3125
+      ],
+      "mean_agent_queries": 5.0671875
+    },
+    "paired": {
+      "success_to_failure": 246,
+      "failure_to_success": 104,
+      "both_success": 854,
+      "both_failure": 76
+    },
+    "optimizer_near_peak": {
+      "policy_loss": 0.0036625152919441462,
+      "value_loss": 0.0009797868493478744,
+      "value_explained_variance": 0.7070468723773956,
+      "entropy": 2.8264846563339234,
+      "mean_std": 0.9959965586662293,
+      "mean_ratio": 1.0000073611736298,
+      "clip_fraction": 0.0329061409458518,
+      "approx_kl": 0.007056236173957587,
+      "policy_grad_norm": 0.22088869661092758,
+      "hn_grad_norm": 0.008006953820586204,
+      "critic_grad_norm": 0.008146574115380644,
+      "nmd": 0.3314583465456963,
+      "nmd_ema": 0.2057746792868298,
+      "alpha": 0.18751514256000518
+    },
+    "optimizer_last_10": {
+      "policy_loss": 0.003984009218402207,
+      "value_loss": 0.0010142706683836876,
+      "value_explained_variance": 0.6988413691520691,
+      "entropy": 2.8365787744522093,
+      "mean_std": 0.9995400369167328,
+      "mean_ratio": 0.9998932838439941,
+      "clip_fraction": 0.03548466619104147,
+      "approx_kl": 0.007327720057219267,
+      "policy_grad_norm": 0.2163927212357521,
+      "hn_grad_norm": 0.0025536974193528295,
+      "critic_grad_norm": 0.004482003953307867,
+      "nmd": 4.770351815223694,
+      "nmd_ema": 3.3040698067280077,
+      "alpha": 0.04624498300254345
+    },
+    "max_pre_update_log_prob_mse": 2.945254789193778e-16,
+    "curve": [
+      {
+        "training_round": 0,
+        "training_environment_steps": 0,
+        "simulator_training_environment_steps": 0,
+        "completion_rate": 0.0,
+        "goal_completion_percent": 9.21875,
+        "avg_reward": 0.0921875
+      },
+      {
+        "training_round": 25,
+        "training_environment_steps": 632974,
+        "simulator_training_environment_steps": 640000,
+        "completion_rate": 2.34375,
+        "goal_completion_percent": 39.51171875,
+        "avg_reward": 0.3951171875
+      },
+      {
+        "training_round": 50,
+        "training_environment_steps": 1245498,
+        "simulator_training_environment_steps": 1280000,
+        "completion_rate": 18.90625,
+        "goal_completion_percent": 66.8359375,
+        "avg_reward": 0.668359375
+      },
+      {
+        "training_round": 75,
+        "training_environment_steps": 1778966,
+        "simulator_training_environment_steps": 1920000,
+        "completion_rate": 75.9375,
+        "goal_completion_percent": 93.515625,
+        "avg_reward": 0.93515625
+      },
+      {
+        "training_round": 100,
+        "training_environment_steps": 2216082,
+        "simulator_training_environment_steps": 2560000,
+        "completion_rate": 75.15625,
+        "goal_completion_percent": 93.2421875,
+        "avg_reward": 0.932421875
+      },
+      {
+        "training_round": 125,
+        "training_environment_steps": 2638664,
+        "simulator_training_environment_steps": 3200000,
+        "completion_rate": 78.828125,
+        "goal_completion_percent": 94.27734375,
+        "avg_reward": 0.9427734375
+      },
+      {
+        "training_round": 150,
+        "training_environment_steps": 3030112,
+        "simulator_training_environment_steps": 3840000,
+        "completion_rate": 85.15625,
+        "goal_completion_percent": 96.0546875,
+        "avg_reward": 0.960546875
+      },
+      {
+        "training_round": 175,
+        "training_environment_steps": 3417132,
+        "simulator_training_environment_steps": 4480000,
+        "completion_rate": 85.9375,
+        "goal_completion_percent": 96.2109375,
+        "avg_reward": 0.962109375
+      },
+      {
+        "training_round": 200,
+        "training_environment_steps": 3795882,
+        "simulator_training_environment_steps": 5120000,
+        "completion_rate": 84.53125,
+        "goal_completion_percent": 95.703125,
+        "avg_reward": 0.95703125
+      },
+      {
+        "training_round": 225,
+        "training_environment_steps": 4173837,
+        "simulator_training_environment_steps": 5760000,
+        "completion_rate": 84.6875,
+        "goal_completion_percent": 95.9765625,
+        "avg_reward": 0.959765625
+      },
+      {
+        "training_round": 250,
+        "training_environment_steps": 4546250,
+        "simulator_training_environment_steps": 6400000,
+        "completion_rate": 80.3125,
+        "goal_completion_percent": 94.765625,
+        "avg_reward": 0.94765625
+      },
+      {
+        "training_round": 275,
+        "training_environment_steps": 4919185,
+        "simulator_training_environment_steps": 7040000,
+        "completion_rate": 77.1875,
+        "goal_completion_percent": 93.671875,
+        "avg_reward": 0.93671875
+      },
+      {
+        "training_round": 300,
+        "training_environment_steps": 5302711,
+        "simulator_training_environment_steps": 7680000,
+        "completion_rate": 70.859375,
+        "goal_completion_percent": 91.7578125,
+        "avg_reward": 0.917578125
+      },
+      {
+        "training_round": 325,
+        "training_environment_steps": 5698922,
+        "simulator_training_environment_steps": 8320000,
+        "completion_rate": 74.609375,
+        "goal_completion_percent": 93.0078125,
+        "avg_reward": 0.930078125
+      },
+      {
+        "training_round": 350,
+        "training_environment_steps": 6083877,
+        "simulator_training_environment_steps": 8960000,
+        "completion_rate": 74.453125,
+        "goal_completion_percent": 92.890625,
+        "avg_reward": 0.92890625
+      },
+      {
+        "training_round": 375,
+        "training_environment_steps": 6472587,
+        "simulator_training_environment_steps": 9600000,
+        "completion_rate": 71.796875,
+        "goal_completion_percent": 92.03125,
+        "avg_reward": 0.9203125
+      },
+      {
+        "training_round": 400,
+        "training_environment_steps": 6855327,
+        "simulator_training_environment_steps": 10240000,
+        "completion_rate": 74.84375,
+        "goal_completion_percent": 93.02734375,
+        "avg_reward": 0.9302734375
+      }
+    ]
+  },
+  "navigation_fixed_50_seed42": {
+    "peak_round": 50,
+    "final_round": 400,
+    "peak_success": 82.109375,
+    "final_success": 63.28125,
+    "peak_to_final_drop_pp": 18.828125,
+    "largest_adjacent_drop_pp": 18.359375000000007,
+    "post_peak_successes": [
+      [
+        75,
+        63.74999999999999
+      ],
+      [
+        100,
+        59.53125
+      ],
+      [
+        125,
+        75.625
+      ],
+      [
+        150,
+        73.359375
+      ],
+      [
+        175,
+        81.328125
+      ],
+      [
+        200,
+        73.984375
+      ],
+      [
+        225,
+        74.453125
+      ],
+      [
+        250,
+        77.109375
+      ],
+      [
+        275,
+        72.96875
+      ],
+      [
+        300,
+        71.40625
+      ],
+      [
+        325,
+        72.8125
+      ],
+      [
+        350,
+        70.15625
+      ],
+      [
+        375,
+        63.4375
+      ],
+      [
+        400,
+        63.28125
+      ]
+    ],
+    "peak": {
+      "episodes": 1280,
+      "success_percent": 82.109375,
+      "mean_team_return": 0.9517578125,
+      "mean_length": 118.9953125,
+      "mean_team_queries": 2.78359375,
+      "milestone_percent": {},
+      "goal_completion_percent": 95.17578125,
+      "goals_per_episode_histogram": {
+        "4": 1051,
+        "3": 211,
+        "2": 18
+      },
+      "per_agent_collected_percent": [
+        94.375,
+        95.234375,
+        94.765625,
+        96.328125
+      ],
+      "per_agent_detected_percent": [
+        94.921875,
+        95.859375,
+        94.84375,
+        96.875
+      ],
+      "detected_but_not_collected_percent": [
+        0.546875,
+        0.625,
+        0.078125,
+        0.546875
+      ],
+      "mean_agent_queries": 2.78359375
+    },
+    "final": {
+      "episodes": 1280,
+      "success_percent": 63.28125,
+      "mean_team_return": 0.89453125,
+      "mean_length": 126.159375,
+      "mean_team_queries": 2.8328125,
+      "milestone_percent": {},
+      "goal_completion_percent": 89.453125,
+      "goals_per_episode_histogram": {
+        "4": 810,
+        "3": 408,
+        "2": 54,
+        "1": 8
+      },
+      "per_agent_collected_percent": [
+        89.6875,
+        90.0,
+        88.4375,
+        89.6875
+      ],
+      "per_agent_detected_percent": [
+        90.15625,
+        90.3125,
+        88.984375,
+        90.078125
+      ],
+      "detected_but_not_collected_percent": [
+        0.46875,
+        0.3125,
+        0.546875,
+        0.390625
+      ],
+      "mean_agent_queries": 2.8328125
+    },
+    "paired": {
+      "success_to_failure": 321,
+      "failure_to_success": 80,
+      "both_success": 730,
+      "both_failure": 149
+    },
+    "optimizer_near_peak": {
+      "policy_loss": 0.0005044323683250695,
+      "value_loss": 0.0007774546334985644,
+      "value_explained_variance": 0.7094436764717102,
+      "entropy": 2.831616020202637,
+      "mean_std": 0.997262978553772,
+      "mean_ratio": 1.0000025391578675,
+      "clip_fraction": 0.03405075538903475,
+      "approx_kl": 0.007245983183383942,
+      "policy_grad_norm": 0.15034977942705155,
+      "hn_grad_norm": 0.0717509139329195,
+      "critic_grad_norm": 0.010944450087845326,
+      "nmd": 0.00016439755927422084,
+      "nmd_ema": 0.0003341960441642611,
+      "alpha": 4.629232931137085
+    },
+    "optimizer_last_10": {
+      "policy_loss": 0.003302835067734122,
+      "value_loss": 0.0009713110222946853,
+      "value_explained_variance": 0.6887773036956787,
+      "entropy": 2.8377771854400633,
+      "mean_std": 0.999957275390625,
+      "mean_ratio": 0.9999031782150268,
+      "clip_fraction": 0.032492052949965,
+      "approx_kl": 0.00692443260923028,
+      "policy_grad_norm": 0.1964454710483551,
+      "hn_grad_norm": 0.000768497577519156,
+      "critic_grad_norm": 0.0038793406449258326,
+      "nmd": 0.46510749906301496,
+      "nmd_ema": 1.0830112743704485,
+      "alpha": 0.08137280121445656
+    },
+    "max_pre_update_log_prob_mse": 2.540487919249694e-16,
+    "curve": [
+      {
+        "training_round": 0,
+        "training_environment_steps": 0,
+        "simulator_training_environment_steps": 0,
+        "completion_rate": 0.0,
+        "goal_completion_percent": 9.21875,
+        "avg_reward": 0.0921875
+      },
+      {
+        "training_round": 25,
+        "training_environment_steps": 631386,
+        "simulator_training_environment_steps": 640000,
+        "completion_rate": 6.328125,
+        "goal_completion_percent": 49.23828125,
+        "avg_reward": 0.4923828125
+      },
+      {
+        "training_round": 50,
+        "training_environment_steps": 1181734,
+        "simulator_training_environment_steps": 1280000,
+        "completion_rate": 82.109375,
+        "goal_completion_percent": 95.17578125,
+        "avg_reward": 0.9517578125
+      },
+      {
+        "training_round": 75,
+        "training_environment_steps": 1650699,
+        "simulator_training_environment_steps": 1920000,
+        "completion_rate": 63.74999999999999,
+        "goal_completion_percent": 89.66796875,
+        "avg_reward": 0.8966796875
+      },
+      {
+        "training_round": 100,
+        "training_environment_steps": 2112190,
+        "simulator_training_environment_steps": 2560000,
+        "completion_rate": 59.53125,
+        "goal_completion_percent": 88.02734375,
+        "avg_reward": 0.8802734375
+      },
+      {
+        "training_round": 125,
+        "training_environment_steps": 2561583,
+        "simulator_training_environment_steps": 3200000,
+        "completion_rate": 75.625,
+        "goal_completion_percent": 93.3203125,
+        "avg_reward": 0.933203125
+      },
+      {
+        "training_round": 150,
+        "training_environment_steps": 2958229,
+        "simulator_training_environment_steps": 3840000,
+        "completion_rate": 73.359375,
+        "goal_completion_percent": 92.578125,
+        "avg_reward": 0.92578125
+      },
+      {
+        "training_round": 175,
+        "training_environment_steps": 3347179,
+        "simulator_training_environment_steps": 4480000,
+        "completion_rate": 81.328125,
+        "goal_completion_percent": 94.98046875,
+        "avg_reward": 0.9498046875
+      },
+      {
+        "training_round": 200,
+        "training_environment_steps": 3718919,
+        "simulator_training_environment_steps": 5120000,
+        "completion_rate": 73.984375,
+        "goal_completion_percent": 92.8515625,
+        "avg_reward": 0.928515625
+      },
+      {
+        "training_round": 225,
+        "training_environment_steps": 4097496,
+        "simulator_training_environment_steps": 5760000,
+        "completion_rate": 74.453125,
+        "goal_completion_percent": 93.125,
+        "avg_reward": 0.93125
+      },
+      {
+        "training_round": 250,
+        "training_environment_steps": 4470009,
+        "simulator_training_environment_steps": 6400000,
+        "completion_rate": 77.109375,
+        "goal_completion_percent": 93.8671875,
+        "avg_reward": 0.938671875
+      },
+      {
+        "training_round": 275,
+        "training_environment_steps": 4845658,
+        "simulator_training_environment_steps": 7040000,
+        "completion_rate": 72.96875,
+        "goal_completion_percent": 92.63671875,
+        "avg_reward": 0.9263671875
+      },
+      {
+        "training_round": 300,
+        "training_environment_steps": 5220992,
+        "simulator_training_environment_steps": 7680000,
+        "completion_rate": 71.40625,
+        "goal_completion_percent": 92.05078125,
+        "avg_reward": 0.9205078125
+      },
+      {
+        "training_round": 325,
+        "training_environment_steps": 5600922,
+        "simulator_training_environment_steps": 8320000,
+        "completion_rate": 72.8125,
+        "goal_completion_percent": 92.578125,
+        "avg_reward": 0.92578125
+      },
+      {
+        "training_round": 350,
+        "training_environment_steps": 5978000,
+        "simulator_training_environment_steps": 8960000,
+        "completion_rate": 70.15625,
+        "goal_completion_percent": 91.66015625,
+        "avg_reward": 0.9166015625
+      },
+      {
+        "training_round": 375,
+        "training_environment_steps": 6381894,
+        "simulator_training_environment_steps": 9600000,
+        "completion_rate": 63.4375,
+        "goal_completion_percent": 89.21875,
+        "avg_reward": 0.8921875
+      },
+      {
+        "training_round": 400,
+        "training_environment_steps": 6796064,
+        "simulator_training_environment_steps": 10240000,
+        "completion_rate": 63.28125,
+        "goal_completion_percent": 89.453125,
+        "avg_reward": 0.89453125
+      }
+    ]
+  },
+  "navigation_single_seed42": {
+    "peak_round": 250,
+    "final_round": 400,
+    "peak_success": 79.765625,
+    "final_success": 74.140625,
+    "peak_to_final_drop_pp": 5.625,
+    "largest_adjacent_drop_pp": 15.0,
+    "post_peak_successes": [
+      [
+        275,
+        73.671875
+      ],
+      [
+        300,
+        70.46875
+      ],
+      [
+        325,
+        73.4375
+      ],
+      [
+        350,
+        70.15625
+      ],
+      [
+        375,
+        73.75
+      ],
+      [
+        400,
+        74.140625
+      ]
+    ],
+    "peak": {
+      "episodes": 1280,
+      "success_percent": 79.765625,
+      "mean_team_return": 0.9455078125,
+      "mean_length": 115.70859375,
+      "mean_team_queries": 1.0,
+      "milestone_percent": {},
+      "goal_completion_percent": 94.55078125,
+      "goals_per_episode_histogram": {
+        "4": 1021,
+        "2": 18,
+        "3": 240,
+        "1": 1
+      },
+      "per_agent_collected_percent": [
+        93.59375,
+        94.609375,
+        94.53125,
+        95.46875
+      ],
+      "per_agent_detected_percent": [
+        94.375,
+        95.0,
+        94.921875,
+        95.625
+      ],
+      "detected_but_not_collected_percent": [
+        0.78125,
+        0.390625,
+        0.390625,
+        0.15625
+      ],
+      "mean_agent_queries": 1.0
+    },
+    "final": {
+      "episodes": 1280,
+      "success_percent": 74.140625,
+      "mean_team_return": 0.929296875,
+      "mean_length": 119.13828125,
+      "mean_team_queries": 1.0,
+      "milestone_percent": {},
+      "goal_completion_percent": 92.9296875,
+      "goals_per_episode_histogram": {
+        "4": 949,
+        "3": 302,
+        "2": 27,
+        "1": 2
+      },
+      "per_agent_collected_percent": [
+        92.65625,
+        93.515625,
+        91.71875,
+        93.828125
+      ],
+      "per_agent_detected_percent": [
+        93.4375,
+        93.75,
+        92.1875,
+        94.0625
+      ],
+      "detected_but_not_collected_percent": [
+        0.78125,
+        0.234375,
+        0.46875,
+        0.234375
+      ],
+      "mean_agent_queries": 1.0
+    },
+    "paired": {
+      "success_to_failure": 144,
+      "failure_to_success": 72,
+      "both_success": 877,
+      "both_failure": 187
+    },
+    "optimizer_near_peak": {
+      "policy_loss": 0.004820843273773789,
+      "value_loss": 0.0010315533494576813,
+      "value_explained_variance": 0.697930371761322,
+      "entropy": 2.837343525886536,
+      "mean_std": 0.9997693240642548,
+      "mean_ratio": 0.9998749554157257,
+      "clip_fraction": 0.034314035624265674,
+      "approx_kl": 0.007155555067583919,
+      "policy_grad_norm": 0.20995582789182662,
+      "hn_grad_norm": 0.020549632608890533,
+      "critic_grad_norm": 0.0057855399791151285,
+      "nmd": 0.004045330022927373,
+      "nmd_ema": 0.0019655870191769447,
+      "alpha": 1.9493232727050782
+    },
+    "optimizer_last_10": {
+      "policy_loss": 0.00489056995138526,
+      "value_loss": 0.0009907132538501174,
+      "value_explained_variance": 0.7097729027271271,
+      "entropy": 2.837876629829407,
+      "mean_std": 1.0,
+      "mean_ratio": 1.0000153005123138,
+      "clip_fraction": 0.03384047131985426,
+      "approx_kl": 0.007101639825850725,
+      "policy_grad_norm": 0.2127026930451393,
+      "hn_grad_norm": 0.00163510573329404,
+      "critic_grad_norm": 0.0037535322597250344,
+      "nmd": 0.21839674450457097,
+      "nmd_ema": 0.32148203784773666,
+      "alpha": 0.14847931414842605
+    },
+    "max_pre_update_log_prob_mse": 0.0,
+    "curve": [
+      {
+        "training_round": 0,
+        "training_environment_steps": 0,
+        "simulator_training_environment_steps": 0,
+        "completion_rate": 0.0,
+        "goal_completion_percent": 9.21875,
+        "avg_reward": 0.0921875
+      },
+      {
+        "training_round": 25,
+        "training_environment_steps": 630325,
+        "simulator_training_environment_steps": 640000,
+        "completion_rate": 5.703125,
+        "goal_completion_percent": 48.671875,
+        "avg_reward": 0.48671875
+      },
+      {
+        "training_round": 50,
+        "training_environment_steps": 1199482,
+        "simulator_training_environment_steps": 1280000,
+        "completion_rate": 76.328125,
+        "goal_completion_percent": 93.37890625,
+        "avg_reward": 0.9337890625
+      },
+      {
+        "training_round": 75,
+        "training_environment_steps": 1651891,
+        "simulator_training_environment_steps": 1920000,
+        "completion_rate": 74.21875,
+        "goal_completion_percent": 92.8125,
+        "avg_reward": 0.928125
+      },
+      {
+        "training_round": 100,
+        "training_environment_steps": 2100846,
+        "simulator_training_environment_steps": 2560000,
+        "completion_rate": 59.21875,
+        "goal_completion_percent": 87.91015625,
+        "avg_reward": 0.8791015625
+      },
+      {
+        "training_round": 125,
+        "training_environment_steps": 2542506,
+        "simulator_training_environment_steps": 3200000,
+        "completion_rate": 66.328125,
+        "goal_completion_percent": 90.1953125,
+        "avg_reward": 0.901953125
+      },
+      {
+        "training_round": 150,
+        "training_environment_steps": 2952716,
+        "simulator_training_environment_steps": 3840000,
+        "completion_rate": 66.40625,
+        "goal_completion_percent": 90.3125,
+        "avg_reward": 0.903125
+      },
+      {
+        "training_round": 175,
+        "training_environment_steps": 3361915,
+        "simulator_training_environment_steps": 4480000,
+        "completion_rate": 69.921875,
+        "goal_completion_percent": 91.73828125,
+        "avg_reward": 0.9173828125
+      },
+      {
+        "training_round": 200,
+        "training_environment_steps": 3757220,
+        "simulator_training_environment_steps": 5120000,
+        "completion_rate": 68.984375,
+        "goal_completion_percent": 91.11328125,
+        "avg_reward": 0.9111328125
+      },
+      {
+        "training_round": 225,
+        "training_environment_steps": 4149216,
+        "simulator_training_environment_steps": 5760000,
+        "completion_rate": 74.296875,
+        "goal_completion_percent": 92.91015625,
+        "avg_reward": 0.9291015625
+      },
+      {
+        "training_round": 250,
+        "training_environment_steps": 4529159,
+        "simulator_training_environment_steps": 6400000,
+        "completion_rate": 79.765625,
+        "goal_completion_percent": 94.55078125,
+        "avg_reward": 0.9455078125
+      },
+      {
+        "training_round": 275,
+        "training_environment_steps": 4897111,
+        "simulator_training_environment_steps": 7040000,
+        "completion_rate": 73.671875,
+        "goal_completion_percent": 92.734375,
+        "avg_reward": 0.92734375
+      },
+      {
+        "training_round": 300,
+        "training_environment_steps": 5273854,
+        "simulator_training_environment_steps": 7680000,
+        "completion_rate": 70.46875,
+        "goal_completion_percent": 91.97265625,
+        "avg_reward": 0.9197265625
+      },
+      {
+        "training_round": 325,
+        "training_environment_steps": 5654999,
+        "simulator_training_environment_steps": 8320000,
+        "completion_rate": 73.4375,
+        "goal_completion_percent": 92.578125,
+        "avg_reward": 0.92578125
+      },
+      {
+        "training_round": 350,
+        "training_environment_steps": 6044253,
+        "simulator_training_environment_steps": 8960000,
+        "completion_rate": 70.15625,
+        "goal_completion_percent": 91.640625,
+        "avg_reward": 0.91640625
+      },
+      {
+        "training_round": 375,
+        "training_environment_steps": 6430090,
+        "simulator_training_environment_steps": 9600000,
+        "completion_rate": 73.75,
+        "goal_completion_percent": 92.79296875,
+        "avg_reward": 0.9279296875
+      },
+      {
+        "training_round": 400,
+        "training_environment_steps": 6810827,
+        "simulator_training_environment_steps": 10240000,
+        "completion_rate": 74.140625,
+        "goal_completion_percent": 92.9296875,
+        "avg_reward": 0.929296875
+      }
+    ]
+  },
+  "pressure_plate_event_seed42": {
+    "peak_round": 130,
+    "final_round": 200,
+    "peak_success": 99.296875,
+    "final_success": 18.984375,
+    "peak_to_final_drop_pp": 80.3125,
+    "largest_adjacent_drop_pp": 58.046875,
+    "post_peak_successes": [
+      [
+        140,
+        98.28125
+      ],
+      [
+        150,
+        97.578125
+      ],
+      [
+        160,
+        66.328125
+      ],
+      [
+        170,
+        8.28125
+      ],
+      [
+        180,
+        9.296875
+      ],
+      [
+        190,
+        18.359375
+      ],
+      [
+        200,
+        18.984375
+      ]
+    ],
+    "peak": {
+      "episodes": 1280,
+      "success_percent": 99.296875,
+      "mean_team_return": 306.0938817198945,
+      "mean_length": 133.4671875,
+      "mean_team_queries": 3.1296875,
+      "milestone_percent": {
+        "first_door_open_step": 100.0,
+        "first_near_plate_step": 100.0,
+        "first_far_plate_step": 100.0,
+        "first_both_plates_step": 5.0,
+        "first_any_at_goal_step": 100.0,
+        "first_all_at_goal_step": 99.296875
+      },
+      "sample": {
+        "episodes": 40,
+        "visited_all_percent": 100.0,
+        "visited_count_histogram": {
+          "3": 40
+        },
+        "at_goal_count_histogram": {
+          "3": 40
+        },
+        "all_visited_but_not_completed_percent": 0.0,
+        "episodes_with_goal_exit_percent": 2.5,
+        "total_goal_exits": 1,
+        "goal_exit_roles": {
+          "other": 1
+        },
+        "stage_histogram": {
+          "2": 40
+        }
+      }
+    },
+    "final": {
+      "episodes": 1280,
+      "success_percent": 18.984375,
+      "mean_team_return": 306.1291112779388,
+      "mean_length": 187.1875,
+      "mean_team_queries": 3.08515625,
+      "milestone_percent": {
+        "first_door_open_step": 100.0,
+        "first_near_plate_step": 100.0,
+        "first_far_plate_step": 100.0,
+        "first_both_plates_step": 37.5,
+        "first_any_at_goal_step": 100.0,
+        "first_all_at_goal_step": 18.984375
+      },
+      "sample": {
+        "episodes": 40,
+        "visited_all_percent": 100.0,
+        "visited_count_histogram": {
+          "3": 40
+        },
+        "at_goal_count_histogram": {
+          "1": 19,
+          "3": 8,
+          "0": 13
+        },
+        "all_visited_but_not_completed_percent": 80.0,
+        "episodes_with_goal_exit_percent": 100.0,
+        "total_goal_exits": 111,
+        "goal_exit_roles": {
+          "other": 54,
+          "left": 25,
+          "right": 32
+        },
+        "stage_histogram": {
+          "2": 40
+        }
+      }
+    },
+    "paired": {
+      "success_to_failure": 1031,
+      "failure_to_success": 3,
+      "both_success": 240,
+      "both_failure": 6
+    },
+    "optimizer_near_peak": {
+      "policy_loss": 0.002455149404704571,
+      "value_loss": 3.2605749368667603,
+      "value_explained_variance": 0.9028638601303101,
+      "entropy": 1.5748437166213989,
+      "mean_std": 0.605694717168808,
+      "mean_ratio": 1.0001262605190278,
+      "clip_fraction": 0.08762551322579384,
+      "approx_kl": 0.014724463596940041,
+      "policy_grad_norm": 0.6992256462574005,
+      "hn_grad_norm": 2.0541146755218507,
+      "critic_grad_norm": 3.4658065319061278,
+      "nmd_ema": 0.0,
+      "alpha": 1.0
+    },
+    "optimizer_last_10": {
+      "policy_loss": 0.0017012599448207766,
+      "value_loss": 3.2142182350158692,
+      "value_explained_variance": 0.950471180677414,
+      "entropy": 1.606341803073883,
+      "mean_std": 0.6125958085060119,
+      "mean_ratio": 1.000111448764801,
+      "clip_fraction": 0.07873301357030868,
+      "approx_kl": 0.013712045922875404,
+      "policy_grad_norm": 0.5749362200498581,
+      "hn_grad_norm": 1.13258638381958,
+      "critic_grad_norm": 4.340696096420288,
+      "nmd_ema": 0.0,
+      "alpha": 1.0
+    },
+    "max_pre_update_log_prob_mse": 1.8894227274326297e-13,
+    "curve": [
+      {
+        "training_round": 0,
+        "training_environment_steps": 0,
+        "simulator_training_environment_steps": 0,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -4.051149411405383
+      },
+      {
+        "training_round": 10,
+        "training_environment_steps": 256000,
+        "simulator_training_environment_steps": 256000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.8415847962977514
+      },
+      {
+        "training_round": 20,
+        "training_environment_steps": 512000,
+        "simulator_training_environment_steps": 512000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.9096911658140939
+      },
+      {
+        "training_round": 30,
+        "training_environment_steps": 768000,
+        "simulator_training_environment_steps": 768000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.8048663231579318
+      },
+      {
+        "training_round": 40,
+        "training_environment_steps": 1024000,
+        "simulator_training_environment_steps": 1024000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 0.6743564511894447
+      },
+      {
+        "training_round": 50,
+        "training_environment_steps": 1280000,
+        "simulator_training_environment_steps": 1280000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 63.291345349355176
+      },
+      {
+        "training_round": 60,
+        "training_environment_steps": 1536000,
+        "simulator_training_environment_steps": 1536000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 194.04747431173536
+      },
+      {
+        "training_round": 70,
+        "training_environment_steps": 1792000,
+        "simulator_training_environment_steps": 1792000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 197.23657201233883
+      },
+      {
+        "training_round": 80,
+        "training_environment_steps": 2048000,
+        "simulator_training_environment_steps": 2048000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 298.0653918662028
+      },
+      {
+        "training_round": 90,
+        "training_environment_steps": 2302890,
+        "simulator_training_environment_steps": 2304000,
+        "completion_rate": 0.46875,
+        "goal_completion_percent": null,
+        "avg_reward": 301.0563098817446
+      },
+      {
+        "training_round": 100,
+        "training_environment_steps": 2554104,
+        "simulator_training_environment_steps": 2560000,
+        "completion_rate": 1.5625,
+        "goal_completion_percent": null,
+        "avg_reward": 306.7129125540636
+      },
+      {
+        "training_round": 110,
+        "training_environment_steps": 2797038,
+        "simulator_training_environment_steps": 2816000,
+        "completion_rate": 29.921874999999996,
+        "goal_completion_percent": null,
+        "avg_reward": 306.35318400845057
+      },
+      {
+        "training_round": 120,
+        "training_environment_steps": 3015374,
+        "simulator_training_environment_steps": 3072000,
+        "completion_rate": 94.296875,
+        "goal_completion_percent": null,
+        "avg_reward": 306.50836339490445
+      },
+      {
+        "training_round": 130,
+        "training_environment_steps": 3203718,
+        "simulator_training_environment_steps": 3328000,
+        "completion_rate": 99.296875,
+        "goal_completion_percent": null,
+        "avg_reward": 306.0938817198945
+      },
+      {
+        "training_round": 140,
+        "training_environment_steps": 3384945,
+        "simulator_training_environment_steps": 3584000,
+        "completion_rate": 98.28125,
+        "goal_completion_percent": null,
+        "avg_reward": 306.0407760919476
+      },
+      {
+        "training_round": 150,
+        "training_environment_steps": 3575451,
+        "simulator_training_environment_steps": 3840000,
+        "completion_rate": 97.578125,
+        "goal_completion_percent": null,
+        "avg_reward": 306.50985702141577
+      },
+      {
+        "training_round": 160,
+        "training_environment_steps": 3773910,
+        "simulator_training_environment_steps": 4096000,
+        "completion_rate": 66.328125,
+        "goal_completion_percent": null,
+        "avg_reward": 305.7883080299384
+      },
+      {
+        "training_round": 170,
+        "training_environment_steps": 3995607,
+        "simulator_training_environment_steps": 4352000,
+        "completion_rate": 8.28125,
+        "goal_completion_percent": null,
+        "avg_reward": 305.9986107795265
+      },
+      {
+        "training_round": 180,
+        "training_environment_steps": 4219563,
+        "simulator_training_environment_steps": 4608000,
+        "completion_rate": 9.296875,
+        "goal_completion_percent": null,
+        "avg_reward": 305.3864750467672
+      },
+      {
+        "training_round": 190,
+        "training_environment_steps": 4460471,
+        "simulator_training_environment_steps": 4864000,
+        "completion_rate": 18.359375,
+        "goal_completion_percent": null,
+        "avg_reward": 306.2949903020834
+      },
+      {
+        "training_round": 200,
+        "training_environment_steps": 4698137,
+        "simulator_training_environment_steps": 5120000,
+        "completion_rate": 18.984375,
+        "goal_completion_percent": null,
+        "avg_reward": 306.1291112779388
+      }
+    ]
+  },
+  "pressure_plate_fixed_152_seed42": {
+    "peak_round": 0,
+    "final_round": 200,
+    "peak_success": 0.0,
+    "final_success": 0.0,
+    "peak_to_final_drop_pp": 0.0,
+    "largest_adjacent_drop_pp": 0.0,
+    "post_peak_successes": [
+      [
+        10,
+        0.0
+      ],
+      [
+        20,
+        0.0
+      ],
+      [
+        30,
+        0.0
+      ],
+      [
+        40,
+        0.0
+      ],
+      [
+        50,
+        0.0
+      ],
+      [
+        60,
+        0.0
+      ],
+      [
+        70,
+        0.0
+      ],
+      [
+        80,
+        0.0
+      ],
+      [
+        90,
+        0.0
+      ],
+      [
+        100,
+        0.0
+      ],
+      [
+        110,
+        0.0
+      ],
+      [
+        120,
+        0.0
+      ],
+      [
+        130,
+        0.0
+      ],
+      [
+        140,
+        0.0
+      ],
+      [
+        150,
+        0.0
+      ],
+      [
+        160,
+        0.0
+      ],
+      [
+        170,
+        0.0
+      ],
+      [
+        180,
+        0.0
+      ],
+      [
+        190,
+        0.0
+      ],
+      [
+        200,
+        0.0
+      ]
+    ],
+    "peak": {
+      "episodes": 1280,
+      "success_percent": 0.0,
+      "mean_team_return": -4.055976308260631,
+      "mean_length": 200.0,
+      "mean_team_queries": 2.0,
+      "milestone_percent": {
+        "first_door_open_step": 60.15625,
+        "first_near_plate_step": 60.15625,
+        "first_far_plate_step": 0.0,
+        "first_both_plates_step": 0.0,
+        "first_any_at_goal_step": 0.0,
+        "first_all_at_goal_step": 0.0
+      },
+      "sample": {
+        "episodes": 40,
+        "visited_all_percent": 0.0,
+        "visited_count_histogram": {
+          "0": 40
+        },
+        "at_goal_count_histogram": {
+          "0": 40
+        },
+        "all_visited_but_not_completed_percent": 0.0,
+        "episodes_with_goal_exit_percent": 0.0,
+        "total_goal_exits": 0,
+        "goal_exit_roles": {},
+        "stage_histogram": {
+          "0": 40
+        }
+      }
+    },
+    "final": {
+      "episodes": 1280,
+      "success_percent": 0.0,
+      "mean_team_return": 197.67948688875035,
+      "mean_length": 200.0,
+      "mean_team_queries": 2.0,
+      "milestone_percent": {
+        "first_door_open_step": 100.0,
+        "first_near_plate_step": 100.0,
+        "first_far_plate_step": 45.234375,
+        "first_both_plates_step": 0.0,
+        "first_any_at_goal_step": 98.671875,
+        "first_all_at_goal_step": 0.0
+      },
+      "sample": {
+        "episodes": 40,
+        "visited_all_percent": 0.0,
+        "visited_count_histogram": {
+          "2": 40
+        },
+        "at_goal_count_histogram": {
+          "0": 22,
+          "1": 3,
+          "2": 15
+        },
+        "all_visited_but_not_completed_percent": 0.0,
+        "episodes_with_goal_exit_percent": 100.0,
+        "total_goal_exits": 169,
+        "goal_exit_roles": {
+          "right": 83,
+          "other": 86
+        },
+        "stage_histogram": {
+          "1": 37,
+          "2": 3
+        }
+      }
+    },
+    "paired": {
+      "success_to_failure": 0,
+      "failure_to_success": 0,
+      "both_success": 0,
+      "both_failure": 1280
+    },
+    "optimizer_near_peak": {},
+    "optimizer_last_10": {
+      "policy_loss": 0.0015311133116483687,
+      "value_loss": 9.360719013214112,
+      "value_explained_variance": 0.6212123334407806,
+      "entropy": 2.115677809715271,
+      "mean_std": 0.7644707500934601,
+      "mean_ratio": 1.000037145614624,
+      "clip_fraction": 0.06388845518231392,
+      "approx_kl": 0.011912390496581793,
+      "policy_grad_norm": 0.501004335284233,
+      "hn_grad_norm": 1.1792200684547425,
+      "critic_grad_norm": 5.494454169273377,
+      "nmd_ema": 0.0,
+      "alpha": 1.0
+    },
+    "max_pre_update_log_prob_mse": 1.628226904432789e-13,
+    "curve": [
+      {
+        "training_round": 0,
+        "training_environment_steps": 0,
+        "simulator_training_environment_steps": 0,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -4.055976308260631
+      },
+      {
+        "training_round": 10,
+        "training_environment_steps": 256000,
+        "simulator_training_environment_steps": 256000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.8559207096328416
+      },
+      {
+        "training_round": 20,
+        "training_environment_steps": 512000,
+        "simulator_training_environment_steps": 512000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.8313220304727171
+      },
+      {
+        "training_round": 30,
+        "training_environment_steps": 768000,
+        "simulator_training_environment_steps": 768000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.8260807637601696
+      },
+      {
+        "training_round": 40,
+        "training_environment_steps": 1024000,
+        "simulator_training_environment_steps": 1024000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 132.69345339178184
+      },
+      {
+        "training_round": 50,
+        "training_environment_steps": 1280000,
+        "simulator_training_environment_steps": 1280000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 179.17383158025166
+      },
+      {
+        "training_round": 60,
+        "training_environment_steps": 1536000,
+        "simulator_training_environment_steps": 1536000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 240.71001434424244
+      },
+      {
+        "training_round": 70,
+        "training_environment_steps": 1792000,
+        "simulator_training_environment_steps": 1792000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 205.6110613302978
+      },
+      {
+        "training_round": 80,
+        "training_environment_steps": 2048000,
+        "simulator_training_environment_steps": 2048000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 202.1145265866475
+      },
+      {
+        "training_round": 90,
+        "training_environment_steps": 2304000,
+        "simulator_training_environment_steps": 2304000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 195.70749812312647
+      },
+      {
+        "training_round": 100,
+        "training_environment_steps": 2560000,
+        "simulator_training_environment_steps": 2560000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 196.1985513017571
+      },
+      {
+        "training_round": 110,
+        "training_environment_steps": 2816000,
+        "simulator_training_environment_steps": 2816000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 199.6371982072901
+      },
+      {
+        "training_round": 120,
+        "training_environment_steps": 3072000,
+        "simulator_training_environment_steps": 3072000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 198.21930332049214
+      },
+      {
+        "training_round": 130,
+        "training_environment_steps": 3328000,
+        "simulator_training_environment_steps": 3328000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 187.64187881861054
+      },
+      {
+        "training_round": 140,
+        "training_environment_steps": 3584000,
+        "simulator_training_environment_steps": 3584000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 156.93908490955474
+      },
+      {
+        "training_round": 150,
+        "training_environment_steps": 3840000,
+        "simulator_training_environment_steps": 3840000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 152.61301417608396
+      },
+      {
+        "training_round": 160,
+        "training_environment_steps": 4096000,
+        "simulator_training_environment_steps": 4096000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 192.05981883164765
+      },
+      {
+        "training_round": 170,
+        "training_environment_steps": 4352000,
+        "simulator_training_environment_steps": 4352000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 197.44081575100176
+      },
+      {
+        "training_round": 180,
+        "training_environment_steps": 4608000,
+        "simulator_training_environment_steps": 4608000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 198.37560668092883
+      },
+      {
+        "training_round": 190,
+        "training_environment_steps": 4864000,
+        "simulator_training_environment_steps": 4864000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 192.88007321667325
+      },
+      {
+        "training_round": 200,
+        "training_environment_steps": 5120000,
+        "simulator_training_environment_steps": 5120000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 197.67948688875035
+      }
+    ]
+  },
+  "pressure_plate_fixed_38_seed42": {
+    "peak_round": 0,
+    "final_round": 200,
+    "peak_success": 0.0,
+    "final_success": 0.0,
+    "peak_to_final_drop_pp": 0.0,
+    "largest_adjacent_drop_pp": 0.0,
+    "post_peak_successes": [
+      [
+        10,
+        0.0
+      ],
+      [
+        20,
+        0.0
+      ],
+      [
+        30,
+        0.0
+      ],
+      [
+        40,
+        0.0
+      ],
+      [
+        50,
+        0.0
+      ],
+      [
+        60,
+        0.0
+      ],
+      [
+        70,
+        0.0
+      ],
+      [
+        80,
+        0.0
+      ],
+      [
+        90,
+        0.0
+      ],
+      [
+        100,
+        0.0
+      ],
+      [
+        110,
+        0.0
+      ],
+      [
+        120,
+        0.0
+      ],
+      [
+        130,
+        0.0
+      ],
+      [
+        140,
+        0.0
+      ],
+      [
+        150,
+        0.0
+      ],
+      [
+        160,
+        0.0
+      ],
+      [
+        170,
+        0.0
+      ],
+      [
+        180,
+        0.0
+      ],
+      [
+        190,
+        0.0
+      ],
+      [
+        200,
+        0.0
+      ]
+    ],
+    "peak": {
+      "episodes": 1280,
+      "success_percent": 0.0,
+      "mean_team_return": -4.049300798865707,
+      "mean_length": 200.0,
+      "mean_team_queries": 6.0,
+      "milestone_percent": {
+        "first_door_open_step": 60.15625,
+        "first_near_plate_step": 60.15625,
+        "first_far_plate_step": 0.0,
+        "first_both_plates_step": 0.0,
+        "first_any_at_goal_step": 0.0,
+        "first_all_at_goal_step": 0.0
+      },
+      "sample": {
+        "episodes": 40,
+        "visited_all_percent": 0.0,
+        "visited_count_histogram": {
+          "0": 40
+        },
+        "at_goal_count_histogram": {
+          "0": 40
+        },
+        "all_visited_but_not_completed_percent": 0.0,
+        "episodes_with_goal_exit_percent": 0.0,
+        "total_goal_exits": 0,
+        "goal_exit_roles": {},
+        "stage_histogram": {
+          "0": 40
+        }
+      }
+    },
+    "final": {
+      "episodes": 1280,
+      "success_percent": 0.0,
+      "mean_team_return": 210.9659717047491,
+      "mean_length": 200.0,
+      "mean_team_queries": 6.0,
+      "milestone_percent": {
+        "first_door_open_step": 100.0,
+        "first_near_plate_step": 100.0,
+        "first_far_plate_step": 99.84375,
+        "first_both_plates_step": 53.98437499999999,
+        "first_any_at_goal_step": 100.0,
+        "first_all_at_goal_step": 0.0
+      },
+      "sample": {
+        "episodes": 40,
+        "visited_all_percent": 0.0,
+        "visited_count_histogram": {
+          "2": 40
+        },
+        "at_goal_count_histogram": {
+          "1": 19,
+          "0": 21
+        },
+        "all_visited_but_not_completed_percent": 0.0,
+        "episodes_with_goal_exit_percent": 100.0,
+        "total_goal_exits": 80,
+        "goal_exit_roles": {
+          "right": 40,
+          "other": 40
+        },
+        "stage_histogram": {
+          "1": 38,
+          "2": 2
+        }
+      }
+    },
+    "paired": {
+      "success_to_failure": 0,
+      "failure_to_success": 0,
+      "both_success": 0,
+      "both_failure": 1280
+    },
+    "optimizer_near_peak": {},
+    "optimizer_last_10": {
+      "policy_loss": 0.0011806199385318906,
+      "value_loss": 1.702838909626007,
+      "value_explained_variance": 0.9619160771369935,
+      "entropy": 1.7935033202171327,
+      "mean_std": 0.6418743848800659,
+      "mean_ratio": 0.9999365270137787,
+      "clip_fraction": 0.07210199497640132,
+      "approx_kl": 0.012529661320149899,
+      "policy_grad_norm": 0.45485212206840514,
+      "hn_grad_norm": 1.1199929594993592,
+      "critic_grad_norm": 1.1407689452171326,
+      "nmd_ema": 0.0,
+      "alpha": 1.0
+    },
+    "max_pre_update_log_prob_mse": 1.1260166654343887e-13,
+    "curve": [
+      {
+        "training_round": 0,
+        "training_environment_steps": 0,
+        "simulator_training_environment_steps": 0,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -4.049300798865707
+      },
+      {
+        "training_round": 10,
+        "training_environment_steps": 256000,
+        "simulator_training_environment_steps": 256000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 0.44949944420533716
+      },
+      {
+        "training_round": 20,
+        "training_environment_steps": 512000,
+        "simulator_training_environment_steps": 512000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.8179513135443303
+      },
+      {
+        "training_round": 30,
+        "training_environment_steps": 768000,
+        "simulator_training_environment_steps": 768000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.859069127570578
+      },
+      {
+        "training_round": 40,
+        "training_environment_steps": 1024000,
+        "simulator_training_environment_steps": 1024000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.8609986902301083
+      },
+      {
+        "training_round": 50,
+        "training_environment_steps": 1280000,
+        "simulator_training_environment_steps": 1280000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.8708098848142892
+      },
+      {
+        "training_round": 60,
+        "training_environment_steps": 1536000,
+        "simulator_training_environment_steps": 1536000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.8685231988431312
+      },
+      {
+        "training_round": 70,
+        "training_environment_steps": 1792000,
+        "simulator_training_environment_steps": 1792000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.5442335671978044
+      },
+      {
+        "training_round": 80,
+        "training_environment_steps": 2048000,
+        "simulator_training_environment_steps": 2048000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 7.198577410157192
+      },
+      {
+        "training_round": 90,
+        "training_environment_steps": 2304000,
+        "simulator_training_environment_steps": 2304000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 126.32568657957714
+      },
+      {
+        "training_round": 100,
+        "training_environment_steps": 2560000,
+        "simulator_training_environment_steps": 2560000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 196.64585124824438
+      },
+      {
+        "training_round": 110,
+        "training_environment_steps": 2816000,
+        "simulator_training_environment_steps": 2816000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 196.18539441361764
+      },
+      {
+        "training_round": 120,
+        "training_environment_steps": 3072000,
+        "simulator_training_environment_steps": 3072000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 204.02784384005244
+      },
+      {
+        "training_round": 130,
+        "training_environment_steps": 3328000,
+        "simulator_training_environment_steps": 3328000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 206.3374272073117
+      },
+      {
+        "training_round": 140,
+        "training_environment_steps": 3584000,
+        "simulator_training_environment_steps": 3584000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 207.33859720431263
+      },
+      {
+        "training_round": 150,
+        "training_environment_steps": 3840000,
+        "simulator_training_environment_steps": 3840000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 204.66800282869372
+      },
+      {
+        "training_round": 160,
+        "training_environment_steps": 4096000,
+        "simulator_training_environment_steps": 4096000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 201.28064957251513
+      },
+      {
+        "training_round": 170,
+        "training_environment_steps": 4352000,
+        "simulator_training_environment_steps": 4352000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 205.27669376334015
+      },
+      {
+        "training_round": 180,
+        "training_environment_steps": 4608000,
+        "simulator_training_environment_steps": 4608000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 209.40481081533235
+      },
+      {
+        "training_round": 190,
+        "training_environment_steps": 4864000,
+        "simulator_training_environment_steps": 4864000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 210.67445168437158
+      },
+      {
+        "training_round": 200,
+        "training_environment_steps": 5120000,
+        "simulator_training_environment_steps": 5120000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 210.9659717047491
+      }
+    ]
+  },
+  "pressure_plate_fixed_76_seed42": {
+    "peak_round": 120,
+    "final_round": 200,
+    "peak_success": 100.0,
+    "final_success": 0.0,
+    "peak_to_final_drop_pp": 100.0,
+    "largest_adjacent_drop_pp": 90.625,
+    "post_peak_successes": [
+      [
+        130,
+        100.0
+      ],
+      [
+        140,
+        100.0
+      ],
+      [
+        150,
+        100.0
+      ],
+      [
+        160,
+        100.0
+      ],
+      [
+        170,
+        100.0
+      ],
+      [
+        180,
+        100.0
+      ],
+      [
+        190,
+        9.375
+      ],
+      [
+        200,
+        0.0
+      ]
+    ],
+    "peak": {
+      "episodes": 1280,
+      "success_percent": 100.0,
+      "mean_team_return": 307.6570970163765,
+      "mean_length": 127.740625,
+      "mean_team_queries": 2.0,
+      "milestone_percent": {
+        "first_door_open_step": 100.0,
+        "first_near_plate_step": 100.0,
+        "first_far_plate_step": 100.0,
+        "first_both_plates_step": 9.453125,
+        "first_any_at_goal_step": 100.0,
+        "first_all_at_goal_step": 100.0
+      },
+      "sample": {
+        "episodes": 40,
+        "visited_all_percent": 100.0,
+        "visited_count_histogram": {
+          "3": 40
+        },
+        "at_goal_count_histogram": {
+          "3": 40
+        },
+        "all_visited_but_not_completed_percent": 0.0,
+        "episodes_with_goal_exit_percent": 12.5,
+        "total_goal_exits": 5,
+        "goal_exit_roles": {
+          "other": 5
+        },
+        "stage_histogram": {
+          "2": 40
+        }
+      }
+    },
+    "final": {
+      "episodes": 1280,
+      "success_percent": 0.0,
+      "mean_team_return": 305.23656397691417,
+      "mean_length": 200.0,
+      "mean_team_queries": 3.0,
+      "milestone_percent": {
+        "first_door_open_step": 100.0,
+        "first_near_plate_step": 100.0,
+        "first_far_plate_step": 100.0,
+        "first_both_plates_step": 85.859375,
+        "first_any_at_goal_step": 100.0,
+        "first_all_at_goal_step": 0.0
+      },
+      "sample": {
+        "episodes": 40,
+        "visited_all_percent": 100.0,
+        "visited_count_histogram": {
+          "3": 40
+        },
+        "at_goal_count_histogram": {
+          "1": 10,
+          "0": 30
+        },
+        "all_visited_but_not_completed_percent": 100.0,
+        "episodes_with_goal_exit_percent": 100.0,
+        "total_goal_exits": 129,
+        "goal_exit_roles": {
+          "other": 41,
+          "left": 48,
+          "right": 40
+        },
+        "stage_histogram": {
+          "2": 40
+        }
+      }
+    },
+    "paired": {
+      "success_to_failure": 1280,
+      "failure_to_success": 0,
+      "both_success": 0,
+      "both_failure": 0
+    },
+    "optimizer_near_peak": {
+      "policy_loss": 0.0030461232527159154,
+      "value_loss": 2.7658886432647707,
+      "value_explained_variance": 0.8783758342266083,
+      "entropy": 1.829424226284027,
+      "mean_std": 0.67024365067482,
+      "mean_ratio": 0.9999217092990875,
+      "clip_fraction": 0.09625737518072128,
+      "approx_kl": 0.01660394063219428,
+      "policy_grad_norm": 0.6864809453487396,
+      "hn_grad_norm": 2.0868335127830506,
+      "critic_grad_norm": 2.24118173122406,
+      "nmd_ema": 0.0,
+      "alpha": 1.0
+    },
+    "optimizer_last_10": {
+      "policy_loss": 0.002574059646576643,
+      "value_loss": 6.152732419967651,
+      "value_explained_variance": 0.9008305549621582,
+      "entropy": 1.9300303697586059,
+      "mean_std": 0.7010905921459198,
+      "mean_ratio": 1.0006061792373657,
+      "clip_fraction": 0.08725798949599266,
+      "approx_kl": 0.01585632599890232,
+      "policy_grad_norm": 0.5850313156843185,
+      "hn_grad_norm": 1.251273661851883,
+      "critic_grad_norm": 5.429201078414917,
+      "nmd_ema": 0.0,
+      "alpha": 1.0
+    },
+    "max_pre_update_log_prob_mse": 1.5744388215041538e-13,
+    "curve": [
+      {
+        "training_round": 0,
+        "training_environment_steps": 0,
+        "simulator_training_environment_steps": 0,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -4.051078748883432
+      },
+      {
+        "training_round": 10,
+        "training_environment_steps": 256000,
+        "simulator_training_environment_steps": 256000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.943063976169487
+      },
+      {
+        "training_round": 20,
+        "training_environment_steps": 512000,
+        "simulator_training_environment_steps": 512000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.7958622815886207
+      },
+      {
+        "training_round": 30,
+        "training_environment_steps": 768000,
+        "simulator_training_environment_steps": 768000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 6.293429126592274
+      },
+      {
+        "training_round": 40,
+        "training_environment_steps": 1024000,
+        "simulator_training_environment_steps": 1024000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 95.17039794043708
+      },
+      {
+        "training_round": 50,
+        "training_environment_steps": 1280000,
+        "simulator_training_environment_steps": 1280000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 188.05360004694643
+      },
+      {
+        "training_round": 60,
+        "training_environment_steps": 1535999,
+        "simulator_training_environment_steps": 1536000,
+        "completion_rate": 1.40625,
+        "goal_completion_percent": null,
+        "avg_reward": 293.74841381823455
+      },
+      {
+        "training_round": 70,
+        "training_environment_steps": 1787496,
+        "simulator_training_environment_steps": 1792000,
+        "completion_rate": 9.84375,
+        "goal_completion_percent": null,
+        "avg_reward": 305.31446174404743
+      },
+      {
+        "training_round": 80,
+        "training_environment_steps": 2028203,
+        "simulator_training_environment_steps": 2048000,
+        "completion_rate": 37.578125,
+        "goal_completion_percent": null,
+        "avg_reward": 305.79128711671154
+      },
+      {
+        "training_round": 90,
+        "training_environment_steps": 2259328,
+        "simulator_training_environment_steps": 2304000,
+        "completion_rate": 3.046875,
+        "goal_completion_percent": null,
+        "avg_reward": 306.2370975506245
+      },
+      {
+        "training_round": 100,
+        "training_environment_steps": 2489243,
+        "simulator_training_environment_steps": 2560000,
+        "completion_rate": 2.96875,
+        "goal_completion_percent": null,
+        "avg_reward": 305.9122113840541
+      },
+      {
+        "training_round": 110,
+        "training_environment_steps": 2702416,
+        "simulator_training_environment_steps": 2816000,
+        "completion_rate": 99.765625,
+        "goal_completion_percent": null,
+        "avg_reward": 307.8858291680677
+      },
+      {
+        "training_round": 120,
+        "training_environment_steps": 2878561,
+        "simulator_training_environment_steps": 3072000,
+        "completion_rate": 100.0,
+        "goal_completion_percent": null,
+        "avg_reward": 307.6570970163765
+      },
+      {
+        "training_round": 130,
+        "training_environment_steps": 3054751,
+        "simulator_training_environment_steps": 3328000,
+        "completion_rate": 100.0,
+        "goal_completion_percent": null,
+        "avg_reward": 307.5721276655847
+      },
+      {
+        "training_round": 140,
+        "training_environment_steps": 3234873,
+        "simulator_training_environment_steps": 3584000,
+        "completion_rate": 100.0,
+        "goal_completion_percent": null,
+        "avg_reward": 307.82051829467383
+      },
+      {
+        "training_round": 150,
+        "training_environment_steps": 3417324,
+        "simulator_training_environment_steps": 3840000,
+        "completion_rate": 100.0,
+        "goal_completion_percent": null,
+        "avg_reward": 308.10224550167123
+      },
+      {
+        "training_round": 160,
+        "training_environment_steps": 3597285,
+        "simulator_training_environment_steps": 4096000,
+        "completion_rate": 100.0,
+        "goal_completion_percent": null,
+        "avg_reward": 307.74221319121693
+      },
+      {
+        "training_round": 170,
+        "training_environment_steps": 3772535,
+        "simulator_training_environment_steps": 4352000,
+        "completion_rate": 100.0,
+        "goal_completion_percent": null,
+        "avg_reward": 307.9765915501371
+      },
+      {
+        "training_round": 180,
+        "training_environment_steps": 3949657,
+        "simulator_training_environment_steps": 4608000,
+        "completion_rate": 100.0,
+        "goal_completion_percent": null,
+        "avg_reward": 307.72841867163794
+      },
+      {
+        "training_round": 190,
+        "training_environment_steps": 4157451,
+        "simulator_training_environment_steps": 4864000,
+        "completion_rate": 9.375,
+        "goal_completion_percent": null,
+        "avg_reward": 306.98287397853676
+      },
+      {
+        "training_round": 200,
+        "training_environment_steps": 4407920,
+        "simulator_training_environment_steps": 5120000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 305.23656397691417
+      }
+    ]
+  },
+  "pressure_plate_single_seed42": {
+    "peak_round": 0,
+    "final_round": 200,
+    "peak_success": 0.0,
+    "final_success": 0.0,
+    "peak_to_final_drop_pp": 0.0,
+    "largest_adjacent_drop_pp": 0.0,
+    "post_peak_successes": [
+      [
+        10,
+        0.0
+      ],
+      [
+        20,
+        0.0
+      ],
+      [
+        30,
+        0.0
+      ],
+      [
+        40,
+        0.0
+      ],
+      [
+        50,
+        0.0
+      ],
+      [
+        60,
+        0.0
+      ],
+      [
+        70,
+        0.0
+      ],
+      [
+        80,
+        0.0
+      ],
+      [
+        90,
+        0.0
+      ],
+      [
+        100,
+        0.0
+      ],
+      [
+        110,
+        0.0
+      ],
+      [
+        120,
+        0.0
+      ],
+      [
+        130,
+        0.0
+      ],
+      [
+        140,
+        0.0
+      ],
+      [
+        150,
+        0.0
+      ],
+      [
+        160,
+        0.0
+      ],
+      [
+        170,
+        0.0
+      ],
+      [
+        180,
+        0.0
+      ],
+      [
+        190,
+        0.0
+      ],
+      [
+        200,
+        0.0
+      ]
+    ],
+    "peak": {
+      "episodes": 1280,
+      "success_percent": 0.0,
+      "mean_team_return": -4.058192123867444,
+      "mean_length": 200.0,
+      "mean_team_queries": 1.0,
+      "milestone_percent": {
+        "first_door_open_step": 60.15625,
+        "first_near_plate_step": 60.15625,
+        "first_far_plate_step": 0.0,
+        "first_both_plates_step": 0.0,
+        "first_any_at_goal_step": 0.0,
+        "first_all_at_goal_step": 0.0
+      },
+      "sample": {
+        "episodes": 40,
+        "visited_all_percent": 0.0,
+        "visited_count_histogram": {
+          "0": 40
+        },
+        "at_goal_count_histogram": {
+          "0": 40
+        },
+        "all_visited_but_not_completed_percent": 0.0,
+        "episodes_with_goal_exit_percent": 0.0,
+        "total_goal_exits": 0,
+        "goal_exit_roles": {},
+        "stage_histogram": {
+          "0": 40
+        }
+      }
+    },
+    "final": {
+      "episodes": 1280,
+      "success_percent": 0.0,
+      "mean_team_return": 115.12229180515173,
+      "mean_length": 200.0,
+      "mean_team_queries": 1.0,
+      "milestone_percent": {
+        "first_door_open_step": 100.0,
+        "first_near_plate_step": 100.0,
+        "first_far_plate_step": 100.0,
+        "first_both_plates_step": 99.84375,
+        "first_any_at_goal_step": 100.0,
+        "first_all_at_goal_step": 0.0
+      },
+      "sample": {
+        "episodes": 40,
+        "visited_all_percent": 0.0,
+        "visited_count_histogram": {
+          "1": 40
+        },
+        "at_goal_count_histogram": {
+          "0": 35,
+          "1": 5
+        },
+        "all_visited_but_not_completed_percent": 0.0,
+        "episodes_with_goal_exit_percent": 100.0,
+        "total_goal_exits": 114,
+        "goal_exit_roles": {
+          "other": 108,
+          "right": 6
+        },
+        "stage_histogram": {
+          "1": 40
+        }
+      }
+    },
+    "paired": {
+      "success_to_failure": 0,
+      "failure_to_success": 0,
+      "both_success": 0,
+      "both_failure": 1280
+    },
+    "optimizer_near_peak": {},
+    "optimizer_last_10": {
+      "policy_loss": 0.001371352659771219,
+      "value_loss": 1.8986849784851074,
+      "value_explained_variance": 0.9049953699111939,
+      "entropy": 2.2451666831970214,
+      "mean_std": 0.7922812640666962,
+      "mean_ratio": 0.9999381124973297,
+      "clip_fraction": 0.06402734406292439,
+      "approx_kl": 0.011354848276823759,
+      "policy_grad_norm": 0.5734839260578155,
+      "hn_grad_norm": 0.7654885590076447,
+      "critic_grad_norm": 1.8380576610565185,
+      "nmd_ema": 0.0,
+      "alpha": 1.0
+    },
+    "max_pre_update_log_prob_mse": 1.316729657165755e-13,
+    "curve": [
+      {
+        "training_round": 0,
+        "training_environment_steps": 0,
+        "simulator_training_environment_steps": 0,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -4.058192123867444
+      },
+      {
+        "training_round": 10,
+        "training_environment_steps": 256000,
+        "simulator_training_environment_steps": 256000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.8443706197129381
+      },
+      {
+        "training_round": 20,
+        "training_environment_steps": 512000,
+        "simulator_training_environment_steps": 512000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.8638260320452258
+      },
+      {
+        "training_round": 30,
+        "training_environment_steps": 768000,
+        "simulator_training_environment_steps": 768000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.8467754754106107
+      },
+      {
+        "training_round": 40,
+        "training_environment_steps": 1024000,
+        "simulator_training_environment_steps": 1024000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": -0.8461333381982422
+      },
+      {
+        "training_round": 50,
+        "training_environment_steps": 1280000,
+        "simulator_training_environment_steps": 1280000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 3.146732210916005
+      },
+      {
+        "training_round": 60,
+        "training_environment_steps": 1536000,
+        "simulator_training_environment_steps": 1536000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 96.00512757525425
+      },
+      {
+        "training_round": 70,
+        "training_environment_steps": 1792000,
+        "simulator_training_environment_steps": 1792000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 99.4540426825454
+      },
+      {
+        "training_round": 80,
+        "training_environment_steps": 2048000,
+        "simulator_training_environment_steps": 2048000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 99.92867641491489
+      },
+      {
+        "training_round": 90,
+        "training_environment_steps": 2304000,
+        "simulator_training_environment_steps": 2304000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 96.48825706204111
+      },
+      {
+        "training_round": 100,
+        "training_environment_steps": 2560000,
+        "simulator_training_environment_steps": 2560000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 98.64981252702762
+      },
+      {
+        "training_round": 110,
+        "training_environment_steps": 2816000,
+        "simulator_training_environment_steps": 2816000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 103.03533162548118
+      },
+      {
+        "training_round": 120,
+        "training_environment_steps": 3072000,
+        "simulator_training_environment_steps": 3072000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 109.83974223891555
+      },
+      {
+        "training_round": 130,
+        "training_environment_steps": 3328000,
+        "simulator_training_environment_steps": 3328000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 112.87462296651469
+      },
+      {
+        "training_round": 140,
+        "training_environment_steps": 3584000,
+        "simulator_training_environment_steps": 3584000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 113.56392525170277
+      },
+      {
+        "training_round": 150,
+        "training_environment_steps": 3840000,
+        "simulator_training_environment_steps": 3840000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 113.47139966370851
+      },
+      {
+        "training_round": 160,
+        "training_environment_steps": 4096000,
+        "simulator_training_environment_steps": 4096000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 114.19088247614664
+      },
+      {
+        "training_round": 170,
+        "training_environment_steps": 4352000,
+        "simulator_training_environment_steps": 4352000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 114.24571680042041
+      },
+      {
+        "training_round": 180,
+        "training_environment_steps": 4608000,
+        "simulator_training_environment_steps": 4608000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 114.39166088750278
+      },
+      {
+        "training_round": 190,
+        "training_environment_steps": 4864000,
+        "simulator_training_environment_steps": 4864000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 114.63430112500718
+      },
+      {
+        "training_round": 200,
+        "training_environment_steps": 5120000,
+        "simulator_training_environment_steps": 5120000,
+        "completion_rate": 0.0,
+        "goal_completion_percent": null,
+        "avg_reward": 115.12229180515173
+      }
+    ]
+  }
+}

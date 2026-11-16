@@ -121,6 +121,8 @@ def run_quantitative_evaluation(*, config: Config, env, models, adapter, num_age
                                 obs_dim: int, actions_fn, nmd_ema: float | None = None,
                                 tokens_fn=None, num_eval_episodes: int | None = None,
                                 max_eval_steps: int | None = None, after_step_fn=None) -> dict:
+    if config.query_gate.mode != "disabled":
+        raise ValueError("Learned gates require evaluation.research.evaluate with saved gate parameters")
     evaluation = config.evaluation
     num_eval_episodes = num_eval_episodes or evaluation.num_eval_episodes
     max_eval_steps = max_eval_steps or evaluation.max_eval_steps

@@ -1,0 +1,5 @@
+{
+  "baseline_initial_actor_generator_critic": "exact",
+  "serial_vs_parallel_final_actor_generator_critic_gate": "exact",
+  "parallel_check_rounds": 4
+}

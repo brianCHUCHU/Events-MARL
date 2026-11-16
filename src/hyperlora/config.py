@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import dataclasses
+import math
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
@@ -162,6 +163,17 @@ class LoggingConfig:
 
 
 @dataclass(frozen=True)
+class QueryGateConfig:
+    mode: str = "disabled"
+    coverage_epsilon: float = 0.2
+    query_cost: float = 0.01
+    learning_rate: float = 0.0003
+    entropy_coef: float = 0.01
+    hidden_dim: int = 128
+    generation_bucket: int = 32
+
+
+@dataclass(frozen=True)
 class Config:
     method: str
     seed: int
@@ -174,6 +186,7 @@ class Config:
     evaluation: EvalConfig
     logging: LoggingConfig
     research_metrics: bool = False
+    query_gate: QueryGateConfig = dataclasses.field(default_factory=QueryGateConfig)
 
     def to_dict(self) -> dict:
         data = dataclasses.asdict(self)
@@ -186,6 +199,8 @@ class Config:
             del data["research_metrics"]
         if self.model.query_interval is None:
             del data["model"]["query_interval"]
+        if self.query_gate.mode == "disabled":
+            del data["query_gate"]
         return data
 
 
@@ -224,10 +239,14 @@ def load_config(path: str | Path, overrides: Mapping[str, Any] | None = None) ->
     if not path.is_file():
         raise FileNotFoundError(f"config not found: {path}")
     raw = yaml.safe_load(path.read_text())
+    gate_raw = raw.pop("query_gate", {})
     for dotted, value in (overrides or {}).items():
         section, _, key = dotted.partition(".")
         if not key:
             raw[section] = value
+            continue
+        if section == "query_gate":
+            gate_raw[key] = value
             continue
         if section not in raw:
             raise ValueError(f"override '{dotted}' names an unknown section")
@@ -260,12 +279,32 @@ def load_config(path: str | Path, overrides: Mapping[str, Any] | None = None) ->
     config = Config(
         method=method,
         research_metrics=research_metrics,
+        query_gate=_build("query_gate", QueryGateConfig, gate_raw, method),
         seed=int(top["seed"]),
         jax_threefry_partitionable=top["jax_threefry_partitionable"],
         diversity=(None if diversity_cls is None
                    else _build("diversity", diversity_cls, raw["diversity"], method)),
         **{name: _build(name, cls, raw[name], method) for name, cls in _SECTIONS.items()},
     )
+
+    gate = config.query_gate
+    if gate.mode not in ("disabled", "learned", "coverage"):
+        raise ValueError("query_gate.mode must be disabled, learned or coverage")
+    if gate.mode != "disabled":
+        if config.ppo.rollout_steps < 2:
+            raise ValueError("Learned gate training needs a horizon of at least two steps")
+        if not (research_metrics and method == "ours" and config.env.scenario == "pressure_plate"
+                and config.model.adaptive_hypernetwork and config.model.query_interval is None):
+            raise ValueError("Learned gates require adaptive research Ours Pressure Plate without fixed K")
+        for name in ("coverage_epsilon", "query_cost", "learning_rate", "entropy_coef"):
+            value = getattr(gate, name)
+            if not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+                raise ValueError(f"query_gate.{name} must be finite and nonnegative")
+        if gate.coverage_epsilon >= 1 or gate.learning_rate == 0:
+            raise ValueError("Gate learning_rate must be positive and coverage_epsilon in [0, 1)")
+        for name in ("hidden_dim", "generation_bucket"):
+            if type(getattr(gate, name)) is not int or getattr(gate, name) < 1:
+                raise ValueError(f"query_gate.{name} must be a positive integer")
 
     if research_metrics and (method != "ours" or
                              config.env.scenario not in ("pressure_plate", "wind_flocking", "navigation")):

@@ -11,7 +11,7 @@ _LEGACY_EMA_KEY = "current_snd_ma"
 
 def save_checkpoint(path: str | Path, *, policy_params, critic_params, episode: int,
                     hn_params: Any = None, nmd_ema: float | None = None,
-                    snd_ema: float | None = None) -> Path:
+                    snd_ema: float | None = None, gate_params: Any = None) -> Path:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     data: dict[str, Any] = {
@@ -21,6 +21,8 @@ def save_checkpoint(path: str | Path, *, policy_params, critic_params, episode: 
     }
     if hn_params is not None:
         data["hn_params"] = hn_params
+    if gate_params is not None:
+        data["gate_params"] = gate_params
     if nmd_ema is not None:
         data["nmd_ema"] = nmd_ema
     if snd_ema is not None:

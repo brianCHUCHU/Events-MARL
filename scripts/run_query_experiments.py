@@ -30,6 +30,10 @@ PRESSURE_PLATE = {
     "fixed_152": ("model.query_interval=152",),
     "single": ("model.adaptive_hypernetwork=False",),
 }
+PRESSURE_PLATE_GATES = {
+    "learned_gate": ("query_gate.mode=learned", "evaluation.eval_interval=10"),
+    "coverage_gate": ("query_gate.mode=coverage", "evaluation.eval_interval=10"),
+}
 
 
 def compute_run_summary(path, scenario, schedule, seed, wall_seconds):
@@ -216,7 +220,7 @@ def main():
     if args.eval_interval is not None and args.eval_interval < 1:
         parser.error("--eval-interval must be positive")
     if args.schedules is not None:
-        supported = {"pressure_plate": PRESSURE_PLATE, "navigation": NAVIGATION}
+        supported = {"pressure_plate": PRESSURE_PLATE | PRESSURE_PLATE_GATES, "navigation": NAVIGATION}
         if args.scenario not in supported:
             parser.error("--schedules requires --scenario pressure_plate or navigation")
         unknown = set(args.schedules) - supported[args.scenario].keys()
@@ -264,6 +268,9 @@ def main():
         elif args.scenario:
             plan = [entry for entry in plan if entry[0] == args.scenario]
         if args.schedules is not None:
+            if args.scenario == "pressure_plate":
+                plan += [("pressure_plate", name, seed, PRESSURE_PLATE_GATES[name])
+                         for name in args.schedules if name in PRESSURE_PLATE_GATES for seed in seeds]
             plan = [entry for entry in plan if entry[1] in args.schedules]
         if args.eval_interval is not None:
             plan = [(scenario, schedule, seed,
